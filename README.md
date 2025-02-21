@@ -1,1 +1,1 @@
-# ByteBright Music Cataloguing Software
+# ByteBright Music Cataloging Software
