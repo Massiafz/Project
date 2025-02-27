@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
 import re
+from Back_End.Account_Creation.AccountCreationBackEnd import *
+
+# Reads csv into dictionary of dictionaries
+users = load_users()
 
 def validate_email(email: str) -> bool:
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -63,7 +67,7 @@ def open_sign_up_window(window: tk.Tk, account: dict, buttons: dict) -> None:
     sign_up_window.wait_window()
 
 def login(username: str, password: str, account: dict, buttons: dict) -> None:
-    if username in ["massi", "moksh"] and password == "test":
+    if username in users["Username"].values() and users["Password"].values():
         account["username"] = username
         
         for button in buttons["out"]:
@@ -78,7 +82,7 @@ def login(username: str, password: str, account: dict, buttons: dict) -> None:
 
 def sign_up(username: str, email: str, password: str, account: dict, buttons: dict) -> None:
     # Check if the username already exists
-    if username in ["massi"] or email in ["massi@massi.com"]:
+    if username in users["Username"].values() or email in users["Email"].values():
         messagebox.showerror(title="Username Already Exists", message="Username already exists, please try another.")
         return
 
@@ -91,6 +95,18 @@ def sign_up(username: str, email: str, password: str, account: dict, buttons: di
     result = messagebox.askokcancel(title="Confirm Sign Up", message=f"Create account for {username}?")
     
     if result:
+        new_id = max(users["ID"].values()) + 1
+        users["Username"].update({new_id: username})
+        users["Password"].update({new_id: password})
+        users["Email"].update({new_id: email})
+        users["ID"].update({new_id: new_id})
+        
+        # Temporary print function to see dictionary after new user is added
+        print(users)
+        
+        # Update csv with new account
+        save_users(users)
+        
         login(username, password, account, buttons)
 
 def logout(account: dict, buttons: dict):
