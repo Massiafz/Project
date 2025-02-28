@@ -1,23 +1,14 @@
 # account_manager.py
 import csv
 import os
-from dataclasses import  asdict
+from dataclasses import dataclass, asdict
 
-
+@dataclass
 class Account:
-    def __init__(self, username, password, email, id):
-        self.username = username
-        self.password = password
-        self.email = email
-        self.id = id
-
-    def __repr__(self):
-        return f"Account(username={self.username}, email={self.email}, id={self.id})"
-
-    def __eq__(self, other):
-        if isinstance(other, Account):
-            return self.username == other.username and self.id == other.id
-        return False
+    username: str
+    password: str
+    email: str
+    id: int
 
     def __str__(self):
         return f"Account(username={self.username}, email={self.email}, id={self.id})"
@@ -33,12 +24,15 @@ class AccountManager:
             with open(self.filename, newline='', encoding="utf-8") as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    # Convert all keys to lowercase
+                    # Convert all keys to lowercase for consistency
                     row = {key.lower(): value for key, value in row.items()}
-                    # Now we can safely use "username" as the key
-                    account_id = int(row["id"]) if row.get("id") and row["id"].isdigit() else 0
+
+                    # Ensure ID is an integer
+                    account_id = int(row["id"]) if row.get("id") and row["id"].isdigit() else self.get_next_id()
+
+                    # Ensure row is converted into an Account object
                     account = Account(
-                        username=row["username"],
+                        username=row["username"].strip().lower(),
                         password=row["password"],
                         email=row["email"],
                         id=account_id
@@ -47,13 +41,18 @@ class AccountManager:
         return accounts
 
 
+
     def save_accounts(self):
         with open(self.filename, "w", newline='', encoding="utf-8") as csvfile:
             fieldnames = ["username", "password", "email", "id"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for account in self.accounts:
-                writer.writerow(asdict(account))
+                if isinstance(account, Account):  # ✅ Ensure it's a dataclass instance
+                    writer.writerow(asdict(account))
+                else:
+                    print(f"Warning: Skipping non-dataclass object {account}")
+
 
     def add_account(self, account: Account):
         if self.get_account(account.username):
