@@ -1,37 +1,98 @@
+# account_manager.py
+import csv
+import os
+from dataclasses import  asdict
+
+
 class Account:
-    username = None
-    password = None
-    email = None
-    id = None
-    
-    # Constructor
-    def init(self, username, password, email, id):
+    def __init__(self, username, password, email, id):
         self.username = username
         self.password = password
         self.email = email
-        self.ID = id
-        
-    # Getters & Setters
-    def get_username(self):
-        return self.username
-    
-    def get_password(self):
-        return self.password
-    
-    def get_id(self):
-        return self.id
-    
-    def get_email(self):
-        return self.email
-    
-    def set_username(self, username):
-        self.username = username
-    
-    def set_password(self, password):
-        self.password = password
-    
-    def set_id(self, id):
         self.id = id
+
+    def __repr__(self):
+        return f"Account(username={self.username}, email={self.email}, id={self.id})"
+
+    def __eq__(self, other):
+        if isinstance(other, Account):
+            return self.username == other.username and self.id == other.id
+        return False
+
+    def __str__(self):
+        return f"Account(username={self.username}, email={self.email}, id={self.id})"
+
+class AccountManager:
+    def __init__(self, filename="users.csv"):
+        self.filename = filename
+        self.accounts = self.load_accounts()
+
+    def load_accounts(self):
+        accounts = []
+        if os.path.exists(self.filename):
+            with open(self.filename, newline='', encoding="utf-8") as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    # Convert all keys to lowercase
+                    row = {key.lower(): value for key, value in row.items()}
+                    # Now we can safely use "username" as the key
+                    account_id = int(row["id"]) if row.get("id") and row["id"].isdigit() else 0
+                    account = Account(
+                        username=row["username"],
+                        password=row["password"],
+                        email=row["email"],
+                        id=account_id
+                    )
+                    accounts.append(account)
+        return accounts
+
+
+    def save_accounts(self):
+        with open(self.filename, "w", newline='', encoding="utf-8") as csvfile:
+            fieldnames = ["username", "password", "email", "id"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for account in self.accounts:
+                writer.writerow(asdict(account))
+
+    def add_account(self, account: Account):
+        if self.get_account(account.username):
+            print(f"Account with username '{account.username}' already exists.")
+            return False
+        self.accounts.append(account)
+        self.save_accounts()
+        return True
+
+    def update_account(self, username: str, **kwargs):
+        acc = self.get_account(username)
+        if not acc:
+            print(f"Account with username '{username}' not found.")
+            return None
+        for key, value in kwargs.items():
+            if hasattr(acc, key):
+                setattr(acc, key, value)
+        self.save_accounts()
+        return acc
+
+    def get_account(self, username: str):
+        for acc in self.accounts:
+            if acc.username == username:
+                return acc
+        return None
+
+if __name__ == '__main__':
+    manager = AccountManager("users.csv")
     
-    def set_email(self, email):
-        self.email = email
+    # Example usage
+    #THis is for testing
+    # new_acc = Account(username="alice", password="secret123", email="alice@example.com", id=1)
+    # if manager.add_account(new_acc):
+    #     print("Account created:", new_acc)
+    
+    # updated_acc = manager.update_account("alice", email="alice.new@example.com")
+    # if updated_acc:
+    #     print("Updated account:", updated_acc)
+
+    # acc = manager.get_account("alice")
+    # if acc:
+    #     print("Retrieved account:", acc)
