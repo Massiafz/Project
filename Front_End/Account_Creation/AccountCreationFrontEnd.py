@@ -109,6 +109,14 @@ def login(username: str, password: str) -> bool:
     else:
         messagebox.showerror("Login Failed", "Password incorrect.")
         return False
+def logout(current_account: dict, buttons: dict):
+    if "username" in current_account:
+        del current_account["username"]  # Remove the logged-in user
+    buttons["in"][0].grid_remove()
+    for btn in buttons["out"]:
+        btn.grid()
+
+    messagebox.showinfo("Logout Successful", "You have been logged out.")
 
 def sign_up(username: str, email: str, password: str) -> bool:
     if acc_manager.get_account(username) is not None:
