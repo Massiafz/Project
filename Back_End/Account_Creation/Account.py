@@ -62,16 +62,29 @@ class AccountManager:
         self.save_accounts()
         return True
 
-    def update_account(self, username: str, **kwargs):
+    def update_account(self, **kwargs):
+        """Update account details for a given username."""
+        username = kwargs.get("username")  # Get the username to update
         acc = self.get_account(username)
         if not acc:
             print(f"Account with username '{username}' not found.")
             return None
+
+        # Prevent duplicate usernames if changing
+        if "username" in kwargs and kwargs["username"] != acc.username:
+            if self.get_account(kwargs["username"]):
+                print(f"Username '{kwargs['username']}' is already taken.")
+                return None
+
+        # Update attributes dynamically
         for key, value in kwargs.items():
-            if hasattr(acc, key):
+            if hasattr(acc, key) and value:
                 setattr(acc, key, value)
+
+        # Save changes
         self.save_accounts()
         return acc
+
 
     def get_account(self, username: str):
         for acc in self.accounts:

@@ -68,35 +68,86 @@ def open_sign_up_window(window: tk.Tk, current_account: dict, buttons: dict) -> 
     tk.Button(sign_up_window, text="Sign Up", font=("Helvetica", 12), command=do_signup).grid(row=4, column=0, columnspan=2, pady=10)
     sign_up_window.wait_window()
 
-def open_edit_account_window(window: tk.Tk) -> None:
+def open_edit_account_window(window: tk.Tk, current_account: dict) -> None:
+    if "username" not in current_account:
+        messagebox.showerror("Error", "You must be logged in to edit your account.")
+        return
+
     edit_window = tk.Toplevel(window)
-    edit_window.title("Edit Account - Update Email")
-    edit_window.geometry("400x200")
+    edit_window.title("Edit Account - Update Details")
+    edit_window.geometry("400x300")
     edit_window.transient(window)
     edit_window.grab_set()
 
-    tk.Label(edit_window, text="Username:", font=("Helvetica", 12)).grid(row=0, column=0, padx=10, pady=10)
+    tk.Label(edit_window, text="New Username:", font=("Helvetica", 12)).grid(row=0, column=0, padx=10, pady=10)
     tk.Label(edit_window, text="New Email:", font=("Helvetica", 12)).grid(row=1, column=0, padx=10, pady=10)
+    tk.Label(edit_window, text="New Password:", font=("Helvetica", 12)).grid(row=2, column=0, padx=10, pady=10)
 
     username_entry = tk.Entry(edit_window, font=("Helvetica", 12))
-    new_email_entry = tk.Entry(edit_window, font=("Helvetica", 12))
-    username_entry.grid(row=0, column=1, padx=10, pady=10)
-    new_email_entry.grid(row=1, column=1, padx=10, pady=10)
+    email_entry = tk.Entry(edit_window, font=("Helvetica", 12))
+    password_entry = tk.Entry(edit_window, font=("Helvetica", 12), show="*")
 
+    # Pre-fill fields with current values
+    username_entry.insert(0, current_account["username"])
+    email_entry.insert(0, acc_manager.get_account(current_account["username"]).email)
+
+    username_entry.grid(row=0, column=1, padx=10, pady=10)
+    email_entry.grid(row=1, column=1, padx=10, pady=10)
+    password_entry.grid(row=2, column=1, padx=10, pady=10)
+
+    
     def do_edit():
-        username = username_entry.get().strip()
-        new_email = new_email_entry.get().strip()
-        if not validate_email(new_email):
-            messagebox.showerror("Invalid Email", "Please enter a valid email address.")
+        new_username = username_entry.get().strip()
+        new_email = email_entry.get().strip()
+        new_password = password_entry.get().strip()
+
+        old_username = current_account["username"]  # Get the currently logged-in username
+        account = acc_manager.get_account(old_username)  # Fetch current account data
+
+        if not account:
+            messagebox.showerror("Error", "Could not find your account.")
             return
-        updated_account = acc_manager.update_account(username, email=new_email)
-        if updated_account:
-            messagebox.showinfo("Update Successful", "Email updated successfully!")
-            edit_window.destroy()
-        else:
-            messagebox.showerror("Update Failed", "User not found.")
-    tk.Button(edit_window, text="Update Email", font=("Helvetica", 12), command=do_edit).grid(row=2, column=0, columnspan=2, pady=10)
+
+        # Store the updated values in a dictionary ONLY if they changed
+        updates = {"username": old_username}  # Keep track of the old username
+
+        # Check if the username has changed
+        if new_username and new_username != old_username:
+            if acc_manager.get_account(new_username):
+                messagebox.showerror("Username Taken", "This username is already in use.")
+                return
+            updates["username"] = new_username  # Update the username in the dictionary
+
+        # Check if the email has changed and validate it
+        if new_email and new_email != account.email:
+            if not validate_email(new_email):
+                messagebox.showerror("Invalid Email", "Please enter a valid email address.")
+                return
+            updates["email"] = new_email
+
+        # Check if the password has changed
+        if new_password and new_password != account.password:
+            updates["password"] = new_password
+
+        # If no updates, show a message and return
+        if len(updates) == 1:  # Only contains "username" (old one), meaning no updates
+            messagebox.showinfo("No Changes", "No updates were made.")
+            return
+
+        # Apply updates (pass only the modified fields)
+        updated_account = acc_manager.update_account(**updates)
+
+        # If username was changed, update session
+        if "username" in updates and updates["username"] != old_username:
+            current_account["username"] = updates["username"]
+
+        messagebox.showinfo("Success", "Account details updated successfully!")
+        edit_window.destroy()
+
+
+    tk.Button(edit_window, text="Save Changes", font=("Helvetica", 12), command=do_edit).grid(row=3, column=0, columnspan=2, pady=10)
     edit_window.wait_window()
+
 
 def login(username: str, password: str) -> bool:
     account = acc_manager.get_account(username)
@@ -109,6 +160,7 @@ def login(username: str, password: str) -> bool:
     else:
         messagebox.showerror("Login Failed", "Password incorrect.")
         return False
+
 def logout(current_account: dict, buttons: dict):
     if "username" in current_account:
         del current_account["username"]  # Remove the logged-in user
@@ -117,6 +169,19 @@ def logout(current_account: dict, buttons: dict):
         btn.grid()
 
     messagebox.showinfo("Logout Successful", "You have been logged out.")
+    
+def logout(current_account: dict, buttons: dict):
+    """Logs out the current user and updates the UI."""
+    if "username" in current_account:
+        del current_account["username"]  # Remove the logged-in user
+    
+    # Hide logout button, show login & sign-up buttons
+    buttons["in"][0].grid_remove()  
+    for btn in buttons["out"]:
+        btn.grid()
+    
+    messagebox.showinfo("Logout Successful", "You have been logged out.")
+
 
 def sign_up(username: str, email: str, password: str) -> bool:
     if acc_manager.get_account(username) is not None:
