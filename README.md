@@ -4,7 +4,7 @@
 - **Project Manager:** Bach Nguyen ()
 - **Technical Manager:** Massi Afzal ()
 - **Software Quality Lead:** Moksh Patel ()
-- **Back-End Lead:** Jason Guan ()
+- **Back-End Lead:** Jason Guan (100927182)
 - **Front-End Lead:** Vincent Tseng (100912590)
 
 ## 📃 Table Of Contents 📃
@@ -25,7 +25,7 @@ Once they are logged in, they will be able to access the main cataloging feature
 
 
 ## ❓ Instructions To Run ❓
-To retrieve the program, first clone this GitHub repository inside a terminal with the command below:
+To retrieve the program, first ensure git is installed on the computer you are using, then clone this GitHub repository inside a terminal with the command below:
 
 ```
 git clone https://github.com/Massiafz/Project.git
@@ -47,6 +47,7 @@ After doing this, the program will run and show up on your screen.
 #### Overview
 In our first iteration, we created the main account functionalities within the program including:
 - Create account
+- Log in to account
 - Edit account
 - Delete account
 
@@ -58,8 +59,8 @@ Users can then do the following:
 - Delete album
 
 #### What Went Well
-During this iteration, our collaboration was great which led to consistent planning and progress throughout each user story.
-Additionally, we were able to utilize our kanban board effectively to stay organized.
+During this iteration, we practiced agile development very well, and our collaboration was great which led to consistent planning and progress throughout each user story. We were able to achieve this by providing timely and detailed updates on progress and any difficulties that may have arose. This ensured that we would stay on track, and to pick up the pace if we were behind scehdule during the iteration.
+Additionally, we were able to utilize our kanban board effectively to stay organized and to know what immediate and following tasks and user stories to work on.
 Furthermore, even though we had some difficulty implementing specific requirements, we were able to complete them all in the end.
 
 #### What Can Be Improved
