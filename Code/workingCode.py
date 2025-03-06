@@ -1,0 +1,506 @@
+#necessary imports
+import tkinter as tk 
+from tkinter import messagebox  #for pop-up messages
+from tkinter import ttk  #aesthetics
+import csv  #to handle CSV file reading/writing
+import json  #to handle JSON file reading/writing
+import os  #for operating system file/path interactions
+
+# Constant file names for persistent storage.
+USERS_JSON = "users.json"  #stores user login information after they create an account.
+ALBUMS_CSV = "data.csv"  #Stores album data from Kaggle.
+
+# Main application class that manages the window and frames.
+class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main application window.
+    def __init__(self):  #constructor
+        # Initialize the Tk parent class to set up the base GUI window.
+        super().__init__()  #ensure the parent class is initalized first. The parent class is tk.Tk.
+        
+        # Configure the main window title and dimensions.
+        self.title("Album Cataloguing Software")  #title of the window
+        self.geometry("700x500")  #size of the window
+        
+        # Initialize ttk style for a consistent and modern look.
+        style = ttk.Style(self)
+        style.theme_use("clam")  #set a modern theme for the GUI
+        # Configure styling for different widget types.
+        style.configure("TFrame", background="#f0f0f0")
+        style.configure("TLabel", background="#f0f0f0", font=("Helvetica", 12))
+        style.configure("Header.TLabel", font=("Helvetica", 18, "bold"))
+        style.configure("TButton", font=("Helvetica", 10), padding=5)
+        style.configure("TEntry", padding=5)
+        
+        # Load stored user account information from a JSON file.
+        self.users = self.load_users()
+        self.current_user = None  # This will store the username of the currently logged-in user.
+        
+        # Load album data from a CSV file into a list of dictionaries.
+        self.albums = self.load_albums_from_csv()
+        
+        # Create a container frame to hold all the different pages (Login, Signup, Catalog).
+        container = ttk.Frame(self)  #creates a frame to hold different pages (login, signup, catalog).
+        container.pack(side="top", fill="both", expand=True)  #makes the frame take up all available space
+        
+        # Configure grid properties to allow dynamic resizing of the contained frames.
+        container.grid_rowconfigure(0, weight=1)  #Allows the frames rows to expand and contract with the window.
+        container.grid_columnconfigure(0, weight=1)  #Allows the frames columns to expand and contract with the window.
+        
+        # Dictionary to hold references to the different frames.
+        self.frames = {}  #creates a dictionary to store frames. This allows us to switch between frames, without having to destroy and recreate them.
+        
+        # Iterate through each frame class to instantiate and store them in the frames dictionary.
+        for F in (LoginFrame, SignupFrame, CatalogFrame):  #loops through our different frame classes.
+            frame = F(parent=container, controller=self)  #creates an instance of the frame.
+            #parent=container → Makes the frame part of the container frame (which holds all frames).
+            #controller=self → Passes a reference to the main AlbumCatalogApp class, so frames can switch views.
+            self.frames[F.__name__] = frame  #stores the frame in the frames dictionary. The key is the class name.
+            frame.grid(row=0, column=0, sticky="nsew")  #places each frame in the grid. This enables all frames to exist in the same position, but with only one visible at a time.
+        
+        # Set the initial frame to be the Login screen.
+        self.show_frame("LoginFrame")  #Shows the first frame.
+    
+    # Reads user accounts from a JSON file. If the file does not exist or is invalid, an empty dictionary is returned.
+    def load_users(self):
+        if os.path.exists(USERS_JSON):
+            with open(USERS_JSON, "r") as f:
+                try:
+                    return json.load(f)
+                except json.JSONDecodeError:
+                    # Log error or fallback to empty user database.
+                    return {}
+        return {}
+
+    # Saves the users dictionary to users.json.
+    def save_users(self):
+        with open(USERS_JSON, "w") as f:
+            json.dump(self.users, f, indent=4)
+
+    # Reads album data from the CSV file. It ensures the values do not contain whitespaces.
+    # Returns a list of dictionaries where each one represents an album.
+    # Only specific columns are selected from the CSV file. Other (irrelevant) information is not used and does not appear in the catalog.
+    def load_albums_from_csv(self):
+        albums = []
+        if os.path.exists(ALBUMS_CSV):
+            with open(ALBUMS_CSV, newline="", encoding="utf-8") as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    # For each row, create a dictionary with only the desired keys.
+                    album = {
+                        "Artist Name": row.get("Artist Name", "").strip(),
+                        "Album": row.get("Album", "").strip(),
+                        "Genres": row.get("Genres", "").strip(),
+                        "Release Date": row.get("Release Date", "").strip()
+                    }
+                    albums.append(album)
+        return albums
+    
+    # Retrieves the requested frame from the stored frames.
+    # If the frame is CatalogFrame it refreshes the album list to ensure the latest data is displayed.
+    # It raises the selected frame to the front, making it the active view.
+    def show_frame(self, frame_name):
+        frame = self.frames[frame_name]
+        # Special refresh logic for the catalog view to update album list contents.
+        if frame_name == "CatalogFrame":
+            frame.refresh_album_list()
+        # Bring the selected frame to the top.
+        frame.tkraise()
+
+
+# This class produces the login frame. It allows users to enter their username and password.
+# It also has a button to switch to the sign up frame.
+# When the login button is clicked, the entered username and password are checked against the stored user accounts.
+# If the login is successful, the user is taken to the catalog frame.
+# If the login fails, an error message is displayed.
+class LoginFrame(ttk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller  # Keep reference to the main application controller.
+        self.configure(padding=20)  # Add padding around the frame for aesthetics.
+        
+        # Header label for the login form.
+        header = ttk.Label(self, text="Login", style="Header.TLabel")
+        header.grid(row=0, column=0, columnspan=2, pady=(0,15))
+        
+        # Username label and entry field.
+        ttk.Label(self, text="Username:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
+        self.username_entry = ttk.Entry(self)
+        self.username_entry.grid(row=1, column=1, sticky="w", padx=5, pady=5)
+        
+        # Password label and entry field (with masked input).
+        ttk.Label(self, text="Password:").grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        self.password_entry = ttk.Entry(self, show="*")
+        self.password_entry.grid(row=2, column=1, sticky="w", padx=5, pady=5)
+        
+        # Button to trigger login functionality.
+        login_btn = ttk.Button(self, text="Login", command=self.login)
+        login_btn.grid(row=3, column=0, columnspan=2, pady=10)
+        
+        # Button to switch to the sign-up frame.
+        switch_btn = ttk.Button(self, text="Sign Up", command=lambda: controller.show_frame("SignupFrame"))
+        switch_btn.grid(row=4, column=0, columnspan=2, pady=5)
+    
+    def login(self):
+        # Retrieve input from entry fields.
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        users = self.controller.users  # Reference to loaded user data.
+        
+        # Check if the username exists and the password matches.
+        if username in users and users[username]["password"] == password:
+            self.controller.current_user = username  # Set the current user.
+            messagebox.showinfo("Login", "Login successful!")
+            self.controller.show_frame("CatalogFrame")  # Switch to the catalog frame.
+            # Clear the entry fields after successful login.
+            self.username_entry.delete(0, tk.END)
+            self.password_entry.delete(0, tk.END)
+        else:
+            messagebox.showerror("Error", "Invalid username or password.")
+
+
+# This class produces the sign up frame. It allows users to create a new account by entering a username and password.
+# When the create account button is clicked, the entered username and password are checked for validity.
+# If the username already exists, an error message is displayed.
+# If the passwords do not match, an error message is displayed.
+# If the username or password fields are empty, an error message is displayed.
+# If the account is created successfully, the user is taken to the login frame.
+class SignupFrame(ttk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller  # Reference to the main application controller.
+        self.configure(padding=20)
+        
+        # Header label for the sign up form.
+        header = ttk.Label(self, text="Sign Up", style="Header.TLabel")
+        header.grid(row=0, column=0, columnspan=2, pady=(0,15))
+        
+        # Username label and entry field.
+        ttk.Label(self, text="Username:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
+        self.username_entry = ttk.Entry(self)
+        self.username_entry.grid(row=1, column=1, sticky="w", padx=5, pady=5)
+        
+        # Password label and entry field.
+        ttk.Label(self, text="Password:").grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        self.password_entry = ttk.Entry(self, show="*")
+        self.password_entry.grid(row=2, column=1, sticky="w", padx=5, pady=5)
+        
+        # Confirm password label and entry field.
+        ttk.Label(self, text="Confirm Password:").grid(row=3, column=0, sticky="e", padx=5, pady=5)
+        self.confirm_password_entry = ttk.Entry(self, show="*")
+        self.confirm_password_entry.grid(row=3, column=1, sticky="w", padx=5, pady=5)
+        
+        # Button to trigger account creation.
+        create_btn = ttk.Button(self, text="Create Account", command=self.signup)
+        create_btn.grid(row=4, column=0, columnspan=2, pady=10)
+        
+        # Button to go back to the login frame.
+        back_btn = ttk.Button(self, text="Back to Login", command=lambda: controller.show_frame("LoginFrame"))
+        back_btn.grid(row=5, column=0, columnspan=2, pady=5)
+    
+    def signup(self):
+        # Retrieve input values for new account creation.
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        confirm_password = self.confirm_password_entry.get()
+        
+        # Check if the username already exists.
+        if username in self.controller.users:
+            messagebox.showerror("Error", "Username already exists.")
+            return
+        
+        # Check if both password entries match.
+        if password != confirm_password:
+            messagebox.showerror("Error", "Passwords do not match.")
+            return
+        
+        # Check if username and password fields are non-empty.
+        if not username or not password:
+            messagebox.showerror("Error", "Username and password cannot be empty.")
+            return
+        
+        # Create new user account and save to the persistent JSON file.
+        self.controller.users[username] = {"password": password}
+        self.controller.save_users()
+        messagebox.showinfo("Sign Up", "Account created successfully!")
+        # Redirect user back to the login frame.
+        self.controller.show_frame("LoginFrame")
+        # Clear the entry fields.
+        self.username_entry.delete(0, tk.END)
+        self.password_entry.delete(0, tk.END)
+        self.confirm_password_entry.delete(0, tk.END)
+
+
+# This class produces the catalog frame. It displays a list of albums with their artist name, album name, genres, and release date.
+# It has buttons to add, edit, and delete albums.
+# It also has a button to edit the current user's account.
+# When the logout button is clicked, the user is logged out and taken to the login frame.
+class CatalogFrame(ttk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller  # Reference to the main application controller.
+        self.configure(padding=20)
+        
+        # Configure grid properties to allow the album list to expand with the window.
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
+        # Header label for the catalog view.
+        header = ttk.Label(self, text="Album Catalog", style="Header.TLabel")
+        header.grid(row=0, column=0, columnspan=5, pady=(0,15))
+        
+        # Create a sub-frame for the album list and its scrollbar.
+        list_frame = ttk.Frame(self)
+        list_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
+        list_frame.grid_rowconfigure(0, weight=1)
+        list_frame.grid_columnconfigure(0, weight=1)
+        
+        # Create a listbox to display album information.
+        self.album_listbox = tk.Listbox(list_frame, width=80, height=10, font=("Helvetica", 10))
+        self.album_listbox.pack(side="left", fill="both", expand=True)
+        
+        # Add a vertical scrollbar to the listbox.
+        scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=self.album_listbox.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.album_listbox.config(yscrollcommand=scrollbar.set)
+        
+        # Buttons for album actions (Add, Edit, Delete) and account editing/logging out.
+        add_btn = ttk.Button(self, text="Add Album", command=self.add_album)
+        add_btn.grid(row=2, column=0, padx=5, pady=10)
+        
+        edit_album_btn = ttk.Button(self, text="Edit Album", command=self.edit_album)
+        edit_album_btn.grid(row=2, column=1, padx=5, pady=10)
+        
+        delete_btn = ttk.Button(self, text="Delete Album", command=self.delete_album)
+        delete_btn.grid(row=2, column=2, padx=5, pady=10)
+        
+        edit_account_btn = ttk.Button(self, text="Edit Account", command=self.edit_account)
+        edit_account_btn.grid(row=2, column=3, padx=5, pady=10)
+        
+        logout_btn = ttk.Button(self, text="Logout", command=self.logout)
+        logout_btn.grid(row=2, column=4, padx=5, pady=10)
+    
+    # Refreshes the album list display to show the current album data.
+    def refresh_album_list(self):
+        # Clear current list contents.
+        self.album_listbox.delete(0, tk.END)
+        # Loop through each album and format its display string.
+        for idx, album in enumerate(self.controller.albums):
+            album_info = (f"{idx+1}. Artist Name: {album.get('Artist Name', '')} | "
+                          f"Album: {album.get('Album', '')} | "
+                          f"Genres: {album.get('Genres', '')} | "
+                          f"Release Date: {album.get('Release Date', '')}")
+            self.album_listbox.insert(tk.END, album_info)
+    
+    # Opens a new window to add a new album to the catalog.
+    def add_album(self):
+        # Create a top-level window that will behave like a modal dialog.
+        add_win = tk.Toplevel(self)
+        add_win.title("Add Album")
+        add_win.configure(background="#f0f0f0")
+        add_win.grab_set()  # Prevents user interaction with the main window while open.
+        
+        # Create and place labels and entry fields for album details.
+        ttk.Label(add_win, text="Artist Name:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        artist_entry = ttk.Entry(add_win)
+        artist_entry.grid(row=0, column=1, padx=5, pady=5)
+        
+        ttk.Label(add_win, text="Album:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        album_entry = ttk.Entry(add_win)
+        album_entry.grid(row=1, column=1, padx=5, pady=5)
+        
+        ttk.Label(add_win, text="Release Date:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        release_entry = ttk.Entry(add_win)
+        release_entry.grid(row=2, column=1, padx=5, pady=5)
+        
+        ttk.Label(add_win, text="Genres:").grid(row=3, column=0, padx=5, pady=5, sticky="e")
+        genres_entry = ttk.Entry(add_win)
+        genres_entry.grid(row=3, column=1, padx=5, pady=5)
+        
+        # Internal function to save the new album when the button is clicked.
+        def save_album():
+            artist = artist_entry.get().strip()
+            album_name = album_entry.get().strip()
+            release_date = release_entry.get().strip()
+            genres = genres_entry.get().strip()
+            # Validate that required fields are not empty.
+            if not artist or not album_name or not release_date:
+                messagebox.showerror("Error", "Artist Name, Album, and Release Date are required.")
+                return
+            # Create a new album dictionary from the provided data.
+            new_album = {
+                "Artist Name": artist,
+                "Album": album_name,
+                "Release Date": release_date,
+                "Genres": genres
+            }
+            # Append the new album to the album list in the controller.
+            self.controller.albums.append(new_album)
+            # Refresh the displayed album list.
+            self.refresh_album_list()
+            # Close the add album window.
+            add_win.destroy()
+        
+        # Button to trigger saving of the new album.
+        ttk.Button(add_win, text="Save Album", command=save_album).grid(row=4, column=0, columnspan=2, pady=10)
+    
+    # Opens a new window to edit the selected album's details.
+    def edit_album(self):
+        selected = self.album_listbox.curselection()
+        if not selected:
+            messagebox.showerror("Error", "Please select an album to edit.")
+            return
+        index = selected[0]  # Get the index of the selected album.
+        album = self.controller.albums[index]
+        
+        # Create a modal dialog for editing album details.
+        edit_win = tk.Toplevel(self)
+        edit_win.title("Edit Album")
+        edit_win.configure(background="#f0f0f0")
+        edit_win.grab_set()
+        
+        # Populate fields with current album details.
+        ttk.Label(edit_win, text="Artist Name:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        artist_entry = ttk.Entry(edit_win)
+        artist_entry.insert(0, album.get("Artist Name", ""))
+        artist_entry.grid(row=0, column=1, padx=5, pady=5)
+        
+        ttk.Label(edit_win, text="Album:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        album_entry = ttk.Entry(edit_win)
+        album_entry.insert(0, album.get("Album", ""))
+        album_entry.grid(row=1, column=1, padx=5, pady=5)
+        
+        ttk.Label(edit_win, text="Release Date:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        release_entry = ttk.Entry(edit_win)
+        release_entry.insert(0, album.get("Release Date", ""))
+        release_entry.grid(row=2, column=1, padx=5, pady=5)
+        
+        ttk.Label(edit_win, text="Genres:").grid(row=3, column=0, padx=5, pady=5, sticky="e")
+        genres_entry = ttk.Entry(edit_win)
+        genres_entry.insert(0, album.get("Genres", ""))
+        genres_entry.grid(row=3, column=1, padx=5, pady=5)
+        
+        # Internal function to update album details based on user input.
+        def update_album():
+            updated_artist = artist_entry.get().strip()
+            updated_album = album_entry.get().strip()
+            updated_release = release_entry.get().strip()
+            updated_genres = genres_entry.get().strip()
+            # Validate required fields.
+            if not updated_artist or not updated_album or not updated_release:
+                messagebox.showerror("Error", "Artist Name, Album, and Release Date are required.")
+                return
+            # Update the album information in the controller's album list.
+            self.controller.albums[index] = {
+                "Artist Name": updated_artist,
+                "Album": updated_album,
+                "Release Date": updated_release,
+                "Genres": updated_genres
+            }
+            # Refresh the album list display.
+            self.refresh_album_list()
+            # Close the edit window.
+            edit_win.destroy()
+        
+        # Button to trigger the album update.
+        ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=4, column=0, columnspan=2, pady=10)
+    
+    # Deletes the selected album after confirmation.
+    def delete_album(self):
+        selected = self.album_listbox.curselection()
+        if not selected:
+            messagebox.showerror("Error", "Please select an album to delete.")
+            return
+        index = selected[0]
+        # Ask the user to confirm deletion.
+        confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete the selected album?")
+        if confirm:
+            # Remove the album from the list and refresh the display.
+            del self.controller.albums[index]
+            self.refresh_album_list()
+    
+    # Opens a new window to allow the user to update their account information.
+    def edit_account(self):
+        current_user = self.controller.current_user
+        if not current_user:
+            messagebox.showerror("Error", "No user is logged in.")
+            return
+        
+        # Create a modal dialog for account editing.
+        edit_win = tk.Toplevel(self)
+        edit_win.title("Edit Account")
+        edit_win.configure(background="#f0f0f0")
+        edit_win.grab_set()
+        
+        # Field to verify the current password before allowing any changes.
+        ttk.Label(edit_win, text="Current Password:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        current_pass_entry = ttk.Entry(edit_win, show="*")
+        current_pass_entry.grid(row=0, column=1, padx=5, pady=5)
+        
+        # New username field (optional).
+        ttk.Label(edit_win, text="New Username:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        new_username_entry = ttk.Entry(edit_win)
+        new_username_entry.grid(row=1, column=1, padx=5, pady=5)
+        
+        # New password field.
+        ttk.Label(edit_win, text="New Password:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        new_pass_entry = ttk.Entry(edit_win, show="*")
+        new_pass_entry.grid(row=2, column=1, padx=5, pady=5)
+        
+        # Confirm new password field.
+        ttk.Label(edit_win, text="Confirm New Password:").grid(row=3, column=0, padx=5, pady=5, sticky="e")
+        confirm_new_pass_entry = ttk.Entry(edit_win, show="*")
+        confirm_new_pass_entry.grid(row=3, column=1, padx=5, pady=5)
+        
+        # Internal function to update account information after validating inputs.
+        def update_account():
+            current_pass = current_pass_entry.get()
+            new_username = new_username_entry.get().strip()
+            new_pass = new_pass_entry.get()
+            confirm_new_pass = confirm_new_pass_entry.get()
+            
+            # Verify the current password is correct.
+            if self.controller.users[current_user]["password"] != current_pass:
+                messagebox.showerror("Error", "Current password is incorrect.")
+                return
+            
+            # Update username if a new one is provided and is different.
+            updated_username = current_user
+            if new_username and new_username != current_user:
+                # Check if the new username is already in use.
+                if new_username in self.controller.users:
+                    messagebox.showerror("Error", "Username already exists.")
+                    return
+                # Transfer the user's data to the new username.
+                user_info = self.controller.users.pop(current_user)
+                self.controller.users[new_username] = user_info
+                updated_username = new_username
+                self.controller.current_user = new_username
+            
+            # Update password if new password fields are provided.
+            if new_pass or confirm_new_pass:
+                if new_pass != confirm_new_pass:
+                    messagebox.showerror("Error", "New passwords do not match.")
+                    return
+                if not new_pass:
+                    messagebox.showerror("Error", "New password cannot be empty.")
+                    return
+                self.controller.users[updated_username]["password"] = new_pass
+            
+            # Save the updated user information to persistent storage.
+            self.controller.save_users()
+            messagebox.showinfo("Success", "Account updated successfully!")
+            # Close the account editing window.
+            edit_win.destroy()
+        
+        # Button to trigger the account update process.
+        ttk.Button(edit_win, text="Update Account", command=update_account).grid(row=4, column=0, columnspan=2, pady=10)
+    
+    # Logs out the current user and returns to the login frame.
+    def logout(self):
+        self.controller.current_user = None  # Reset current user.
+        messagebox.showinfo("Logout", "You have been logged out.")
+        self.controller.show_frame("LoginFrame")
+
+# Entry point of the application.
+if __name__ == "__main__":
+    app = AlbumCatalogApp()  # Instantiate the main application window.
+    app.mainloop()  # Start the Tkinter event loop to listen for user events.
