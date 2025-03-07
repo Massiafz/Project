@@ -8,7 +8,8 @@ import os  #for operating system file/path interactions
 
 # Constant file names for persistent storage.
 USERS_JSON = "users.json"  #stores user login information after they create an account.
-ALBUMS_CSV = "data.csv"  #Stores album data from Kaggle.
+ALBUMS_CSV = "Code/cleaned_music_data.csv"
+
 
 # Main application class that manages the window and frames.
 class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main application window.
@@ -86,12 +87,18 @@ class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main applicatio
                 for row in reader:
                     # For each row, create a dictionary with only the desired keys.
                     album = {
-                        "Artist Name": row.get("Artist Name", "").strip(),
+                        "Ranking": row.get("Ranking", "").strip(),
                         "Album": row.get("Album", "").strip(),
+                        "Artist Name": row.get("Artist Name", "").strip(),
+                        "Release Date": row.get("Release Date", "").strip(),
                         "Genres": row.get("Genres", "").strip(),
-                        "Release Date": row.get("Release Date", "").strip()
+                        "Average Rating": row.get("Average Rating", "").strip(),
+                        "Number of Ratings": row.get("Number of Ratings", "").strip(),
+                        "Number of Reviews": row.get("Number of Reviews", "").strip()
                     }
                     albums.append(album)
+        else: 
+            print("The file does not exist.")
         return albums
     
     # Retrieves the requested frame from the stored frames.
