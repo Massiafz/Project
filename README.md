@@ -1,9 +1,9 @@
 # Sahar's Music Cataloging Software 🎵💿🎧
 
 ### Developed By BrightByte:
-- **Project Manager:** Bach Nguyen ()
+- **Project Manager:** Bach Nguyen (100926453)
 - **Technical Manager:** Massi Afzal ()
-- **Software Quality Lead:** Moksh Patel ()
+- **Software Quality Lead:** Moksh Patel (100916422)
 - **Back-End Lead:** Jason Guan (100927182)
 - **Front-End Lead:** Vincent Tseng (100912590)
 
