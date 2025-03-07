@@ -2,7 +2,7 @@
 
 ### Developed By BrightByte:
 - **Project Manager:** Bach Nguyen (100926453)
-- **Technical Manager:** Massi Afzal ()
+- **Technical Manager:** Massi Afzal (100911029)
 - **Software Quality Lead:** Moksh Patel (100916422)
 - **Back-End Lead:** Jason Guan (100927182)
 - **Front-End Lead:** Vincent Tseng (100912590)
