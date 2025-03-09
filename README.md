@@ -44,6 +44,9 @@ After doing this, the program will run and show up on your screen.
 
 ### Iteration 1
 
+#### Demo Phase2 Video:
+https://youtu.be/6iMuDX0EgMA
+
 #### Overview
 In our first iteration, we created the main account functionalities within the program including:
 - Create account
