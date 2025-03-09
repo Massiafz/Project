@@ -5,28 +5,54 @@ from tkinter import ttk  #aesthetics
 import csv  #to handle CSV file reading/writing
 import json  #to handle JSON file reading/writing
 import os  #for operating system file/path interactions
+from PIL import Image, ImageTk #for album image editing
+import re # for email regex
 
 # Constant file names for persistent storage.
-USERS_JSON = "users.json"  #stores user login information after they create an account.
-ALBUMS_CSV = "Code/cleaned_music_data.csv"
+USERS_JSON = "./users.json"  #stores user login information after they create an account.
+ALBUMS_CSV = "./Code/cleaned_music_data.csv"
 
+PRIMARY_BACKGROUND_COLOUR = "#527cc5"
+NAV_BAR_BACKGROUND_COLOUR = "#345db7"
+NAV_BAR_SHADOW_1_COLOUR = "#244d97"
+NAV_BAR_SHADOW_2_COLOUR = "#143d87"
 
 # Main application class that manages the window and frames.
 class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main application window.
     def __init__(self):  #constructor
         # Initialize the Tk parent class to set up the base GUI window.
         super().__init__()  #ensure the parent class is initalized first. The parent class is tk.Tk.
-        
+
         # Configure the main window title and dimensions.
-        self.title("Album Cataloguing Software")  #title of the window
-        self.geometry("700x500")  #size of the window
+        self.title("BrightByte Music Cataloging Software")  #title of the window
+        self.geometry("1280x720")  #size of the window
+
+        image = Image.open("./Code/BrightByteLogo.png")
+        image = image.crop((0, 1080 * 0.25, 1080, 1080 * 0.75))
+        image = image.resize((125, 75), Image.LANCZOS)
+        self.image = ImageTk.PhotoImage(image)
+        
+        nav_bar = tk.Frame(self, bg=NAV_BAR_BACKGROUND_COLOUR)
+        nav_bar.pack(fill="x", side="top")
+
+        shadow = tk.Frame(self, bg=NAV_BAR_SHADOW_1_COLOUR, height=5)
+        shadow.pack(fill="x", side="top")
+
+        shadow2 = tk.Frame(self, bg=NAV_BAR_SHADOW_2_COLOUR, height=5)
+        shadow2.pack(fill="x", side="top")
+
+        logo = tk.Label(nav_bar, image=self.image, bg=NAV_BAR_BACKGROUND_COLOUR)
+        logo.pack(side="left", padx=15, pady=15)
+
+        title = tk.Label(nav_bar, text="BrightByte Music Cataloging Software", font=("Helvetica", 22, "bold"), fg="white", bg=NAV_BAR_BACKGROUND_COLOUR)
+        title.pack(anchor="w", padx=5, pady=40)
         
         # Initialize ttk style for a consistent and modern look.
         style = ttk.Style(self)
         style.theme_use("clam")  #set a modern theme for the GUI
         # Configure styling for different widget types.
-        style.configure("TFrame", background="#f0f0f0")
-        style.configure("TLabel", background="#f0f0f0", font=("Helvetica", 12))
+        style.configure("TFrame", background=PRIMARY_BACKGROUND_COLOUR)
+        style.configure("TLabel", background=PRIMARY_BACKGROUND_COLOUR, foreground="white", font=("Helvetica", 12, "bold"))
         style.configure("Header.TLabel", font=("Helvetica", 18, "bold"))
         style.configure("TButton", font=("Helvetica", 10), padding=5)
         style.configure("TEntry", padding=5)
@@ -55,8 +81,10 @@ class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main applicatio
             #parent=container → Makes the frame part of the container frame (which holds all frames).
             #controller=self → Passes a reference to the main AlbumCatalogApp class, so frames can switch views.
             self.frames[F.__name__] = frame  #stores the frame in the frames dictionary. The key is the class name.
-            frame.grid(row=0, column=0, sticky="nsew")  #places each frame in the grid. This enables all frames to exist in the same position, but with only one visible at a time.
-        
+            
+            frame.anchor("n")
+            frame.grid(row=0, column=0, sticky="nsew", pady=35)
+                
         # Set the initial frame to be the Login screen.
         self.show_frame("LoginFrame")  #Shows the first frame.
     
@@ -118,33 +146,33 @@ class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main applicatio
 # When the login button is clicked, the entered username and password are checked against the stored user accounts.
 # If the login is successful, the user is taken to the catalog frame.
 # If the login fails, an error message is displayed.
-class LoginFrame(ttk.Frame):
+class LoginFrame(tk.Frame):
     def __init__(self, parent, controller):
-        super().__init__(parent)
+        super().__init__(parent, bg=PRIMARY_BACKGROUND_COLOUR)
         self.controller = controller  # Keep reference to the main application controller.
-        self.configure(padding=20)  # Add padding around the frame for aesthetics.
+        # self.configure(padding=20)  # Add padding around the frame for aesthetics.
         
         # Header label for the login form.
         header = ttk.Label(self, text="Login", style="Header.TLabel")
-        header.grid(row=0, column=0, columnspan=2, pady=(0,15))
+        header.grid(row=1, column=0, columnspan=2, pady=(0,15))
         
         # Username label and entry field.
-        ttk.Label(self, text="Username:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
+        ttk.Label(self, text="Username:").grid(row=2, column=0, sticky="e", padx=5, pady=5)
         self.username_entry = ttk.Entry(self)
-        self.username_entry.grid(row=1, column=1, sticky="w", padx=5, pady=5)
+        self.username_entry.grid(row=2, column=1, sticky="w", padx=5, pady=5)
         
         # Password label and entry field (with masked input).
-        ttk.Label(self, text="Password:").grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        ttk.Label(self, text="Password:").grid(row=3, column=0, sticky="e", padx=5, pady=5)
         self.password_entry = ttk.Entry(self, show="*")
-        self.password_entry.grid(row=2, column=1, sticky="w", padx=5, pady=5)
+        self.password_entry.grid(row=3, column=1, sticky="w", padx=5, pady=5)
         
         # Button to trigger login functionality.
         login_btn = ttk.Button(self, text="Login", command=self.login)
-        login_btn.grid(row=3, column=0, columnspan=2, pady=10)
+        login_btn.grid(row=4, column=0, columnspan=2, pady=10)
         
         # Button to switch to the sign-up frame.
         switch_btn = ttk.Button(self, text="Sign Up", command=lambda: controller.show_frame("SignupFrame"))
-        switch_btn.grid(row=4, column=0, columnspan=2, pady=5)
+        switch_btn.grid(row=5, column=0, columnspan=2, pady=5)
     
     def login(self):
         # Retrieve input from entry fields.
@@ -170,11 +198,11 @@ class LoginFrame(ttk.Frame):
 # If the passwords do not match, an error message is displayed.
 # If the username or password fields are empty, an error message is displayed.
 # If the account is created successfully, the user is taken to the login frame.
-class SignupFrame(ttk.Frame):
+class SignupFrame(tk.Frame):
     def __init__(self, parent, controller):
-        super().__init__(parent)
+        super().__init__(parent, bg=PRIMARY_BACKGROUND_COLOUR)
         self.controller = controller  # Reference to the main application controller.
-        self.configure(padding=20)
+        # self.configure(padding=20)
         
         # Header label for the sign up form.
         header = ttk.Label(self, text="Sign Up", style="Header.TLabel")
@@ -184,28 +212,34 @@ class SignupFrame(ttk.Frame):
         ttk.Label(self, text="Username:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
         self.username_entry = ttk.Entry(self)
         self.username_entry.grid(row=1, column=1, sticky="w", padx=5, pady=5)
+
+        # Email label and entry field.
+        ttk.Label(self, text="Email:").grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        self.email_entry = ttk.Entry(self)
+        self.email_entry.grid(row=2, column=1, sticky="w", padx=5, pady=5)
         
         # Password label and entry field.
-        ttk.Label(self, text="Password:").grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        ttk.Label(self, text="Password:").grid(row=3, column=0, sticky="e", padx=5, pady=5)
         self.password_entry = ttk.Entry(self, show="*")
-        self.password_entry.grid(row=2, column=1, sticky="w", padx=5, pady=5)
+        self.password_entry.grid(row=3, column=1, sticky="w", padx=5, pady=5)
         
         # Confirm password label and entry field.
-        ttk.Label(self, text="Confirm Password:").grid(row=3, column=0, sticky="e", padx=5, pady=5)
+        ttk.Label(self, text="Confirm Password:").grid(row=4, column=0, sticky="e", padx=5, pady=5)
         self.confirm_password_entry = ttk.Entry(self, show="*")
-        self.confirm_password_entry.grid(row=3, column=1, sticky="w", padx=5, pady=5)
+        self.confirm_password_entry.grid(row=4, column=1, sticky="w", padx=5, pady=5)
         
         # Button to trigger account creation.
         create_btn = ttk.Button(self, text="Create Account", command=self.signup)
-        create_btn.grid(row=4, column=0, columnspan=2, pady=10)
+        create_btn.grid(row=5, column=0, columnspan=2, pady=10)
         
         # Button to go back to the login frame.
         back_btn = ttk.Button(self, text="Back to Login", command=lambda: controller.show_frame("LoginFrame"))
-        back_btn.grid(row=5, column=0, columnspan=2, pady=5)
+        back_btn.grid(row=6, column=0, columnspan=2, pady=5)
     
     def signup(self):
         # Retrieve input values for new account creation.
         username = self.username_entry.get()
+        email = self.email_entry.get()
         password = self.password_entry.get()
         confirm_password = self.confirm_password_entry.get()
         
@@ -219,13 +253,18 @@ class SignupFrame(ttk.Frame):
             messagebox.showerror("Error", "Passwords do not match.")
             return
         
+        # Check email is proper or valid
+        if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email) is None:
+            messagebox.showerror("Error", "Email is invalid.")
+            return
+        
         # Check if username and password fields are non-empty.
-        if not username or not password:
+        if not username or not password or not email:
             messagebox.showerror("Error", "Username and password cannot be empty.")
             return
         
         # Create new user account and save to the persistent JSON file.
-        self.controller.users[username] = {"password": password}
+        self.controller.users[username] = {"email" : email, "password": password}
         self.controller.save_users()
         messagebox.showinfo("Sign Up", "Account created successfully!")
         # Redirect user back to the login frame.
@@ -240,11 +279,11 @@ class SignupFrame(ttk.Frame):
 # It has buttons to add, edit, and delete albums.
 # It also has a button to edit the current user's account.
 # When the logout button is clicked, the user is logged out and taken to the login frame.
-class CatalogFrame(ttk.Frame):
+class CatalogFrame(tk.Frame):
     def __init__(self, parent, controller):
-        super().__init__(parent)
+        super().__init__(parent, bg=PRIMARY_BACKGROUND_COLOUR)
         self.controller = controller  # Reference to the main application controller.
-        self.configure(padding=20)
+        # self.configure(padding=20)
         
         # Configure grid properties to allow the album list to expand with the window.
         self.grid_rowconfigure(1, weight=1)

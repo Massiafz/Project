@@ -1,5 +1,12 @@
 {
     "bach": {
         "password": "123"
+    },
+    "vincent": {
+        "password": "test"
+    },
+    "emailtest": {
+        "email": "massi@massi.com",
+        "password": "test"
     }
 }
