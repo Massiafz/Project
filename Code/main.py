@@ -10,7 +10,7 @@ import re # for email regex
 
 # Constant file names for persistent storage.
 USERS_JSON = "./users.json"  #stores user login information after they create an account.
-ALBUMS_CSV = "./Code/cleaned_music_data.csv"
+ALBUMS_CSV = "cleaned_music_data.csv"
 
 PRIMARY_BACKGROUND_COLOUR = "#527cc5"
 NAV_BAR_BACKGROUND_COLOUR = "#345db7"
@@ -27,7 +27,7 @@ class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main applicatio
         self.title("BrightByte Music Cataloging Software")  #title of the window
         self.geometry("1280x720")  #size of the window
 
-        image = Image.open("./Code/BrightByteLogo.png")
+        image = Image.open("BrightByteLogo.png")
         image = image.crop((0, 1080 * 0.25, 1080, 1080 * 0.75))
         image = image.resize((125, 75), Image.LANCZOS)
         self.image = ImageTk.PhotoImage(image)
