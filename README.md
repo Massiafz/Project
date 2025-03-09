@@ -31,11 +31,17 @@ To retrieve the program, first ensure git is installed on the computer you are u
 git clone https://github.com/Massiafz/Project.git
 ```
 
+After you have git cloned the repository, you want to change directory into "Code":
+```
+cd .\Code
+```
+
 Then, navigate to the [`main.py`](main.py) file within the folder you cloned the repository into. Next, either click the "run" button in your IDE or enter the following command in the terminal:
 
 ```
 python .\main.py
 ```
+
 
 After doing this, the program will run and show up on your screen.
 
