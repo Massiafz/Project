@@ -5,5 +5,9 @@
     "vincent": {
         "email": "massi@massi.com",
         "password": "test"
+    },
+    "bach": {
+        "email": "bbb@gmail.cc",
+        "password": "111"
     }
 }
