@@ -35,6 +35,12 @@ def data_cleaning_pipeline(input_csv, output_csv, handle_missing='fill'):
     text_columns = ['Album', 'Artist Name', 'Genres', 'Descriptors']
     df[text_columns] = df[text_columns].astype("string")
     df['Ranking'] = df['Ranking'].astype(int)
+    # df['Release Date']= pd.to_datetime(df['Release Date'])
+    # df =df[df['Release Date'].dt.year > 2000]
+    df['Average Rating'] = df['Average Rating'].astype(float)
+    df['Number of Ratings'] = df['Number of Ratings'].astype(int)
+    df = df[df['Ranking']<=1000]
+    
     del df['Descriptors']
     
     # 4. Save cleaned data to a new CSV
