@@ -31,6 +31,7 @@ class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main applicatio
         image = image.crop((0, 1080 * 0.25, 1080, 1080 * 0.75))
         image = image.resize((125, 75), Image.LANCZOS)
         self.image = ImageTk.PhotoImage(image)
+        self.iconphoto(True, self.image)
         
         nav_bar = tk.Frame(self, bg=NAV_BAR_BACKGROUND_COLOUR)
         nav_bar.pack(fill="x", side="top")
@@ -290,51 +291,139 @@ class CatalogFrame(tk.Frame):
         self.grid_columnconfigure(0, weight=1)
         
         # Header label for the catalog view.
-        header = ttk.Label(self, text="Album Catalog", style="Header.TLabel")
-        header.grid(row=0, column=0, columnspan=5, pady=(0,15))
+        header = tk.Label(self, text="Album Catalog", font=("Helvetica", 18, "bold"), fg="white", bg=PRIMARY_BACKGROUND_COLOUR)
+        header.grid(row=0, column=0, sticky="ew", pady=(0, 15))
         
         # Create a sub-frame for the album list and its scrollbar.
-        list_frame = ttk.Frame(self)
-        list_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
-        list_frame.grid_rowconfigure(0, weight=1)
-        list_frame.grid_columnconfigure(0, weight=1)
+        # self.list_frame.grid_rowconfigure(0, weight=1)
+        # self.list_frame.grid_columnconfigure(0, weight=1)
+
+        self.selected_album = None
+        self.album_items = []
+        self.album_cover_images = []
         
         # Create a listbox to display album information.
-        self.album_listbox = tk.Listbox(list_frame, width=80, height=10, font=("Helvetica", 10))
-        self.album_listbox.pack(side="left", fill="both", expand=True)
+        # self.album_listbox = tk.Listbox(None, width=80, height=10, font=("Helvetica", 10)) # self.list_frame
+        # self.album_listbox.pack(side="left", fill="both", expand=True)
         
-        # Add a vertical scrollbar to the listbox.
-        scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=self.album_listbox.yview)
-        scrollbar.pack(side="right", fill="y")
-        self.album_listbox.config(yscrollcommand=scrollbar.set)
+        canvas = tk.Canvas(self, bg=NAV_BAR_SHADOW_1_COLOUR)
+        canvas.grid(row=1, column=0, sticky="nsew")
+        
+        scrollbar = tk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        scrollbar.grid(row=1, column=1, sticky="ns")
+        
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.list_frame = tk.Frame(canvas, bg=NAV_BAR_SHADOW_1_COLOUR)
+        self.list_frame.anchor("n")
+        self.list_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>", lambda event: canvas.itemconfig(window, width=event.width))
+        
+        window = canvas.create_window((canvas.winfo_width() // 2, 0), window=self.list_frame, anchor="n")
+        canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+    
+        # self.album_listbox.config(yscrollcommand=scrollbar.set)
         
         # Buttons for album actions (Add, Edit, Delete) and account editing/logging out.
-        add_btn = ttk.Button(self, text="Add Album", command=self.add_album)
-        add_btn.grid(row=2, column=0, padx=5, pady=10)
+        buttonFrame = tk.Frame(self, bg=PRIMARY_BACKGROUND_COLOUR)
+        buttonFrame.grid(row=2, column=0, columnspan=2, sticky="nsew")
+        buttonFrame.anchor("center")
+
+        add_btn = ttk.Button(buttonFrame, text="Add Album", command=self.add_album)
+        add_btn.grid(row=0, column=0, padx=5, pady=10)
         
-        edit_album_btn = ttk.Button(self, text="Edit Album", command=self.edit_album)
-        edit_album_btn.grid(row=2, column=1, padx=5, pady=10)
+        edit_album_btn = ttk.Button(buttonFrame, text="Edit Album", command=self.edit_album)
+        edit_album_btn.grid(row=0, column=1, padx=5, pady=10)
         
-        delete_btn = ttk.Button(self, text="Delete Album", command=self.delete_album)
-        delete_btn.grid(row=2, column=2, padx=5, pady=10)
+        delete_btn = ttk.Button(buttonFrame, text="Delete Album", command=self.delete_album)
+        delete_btn.grid(row=0, column=2, padx=5, pady=10)
         
-        edit_account_btn = ttk.Button(self, text="Edit Account", command=self.edit_account)
-        edit_account_btn.grid(row=2, column=3, padx=5, pady=10)
+        edit_account_btn = ttk.Button(buttonFrame, text="Edit Account", command=self.edit_account)
+        edit_account_btn.grid(row=0, column=3, padx=5, pady=10)
         
-        logout_btn = ttk.Button(self, text="Logout", command=self.logout)
-        logout_btn.grid(row=2, column=4, padx=5, pady=10)
+        logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
+        logout_btn.grid(row=0, column=4, padx=5, pady=10)
     
     # Refreshes the album list display to show the current album data.
     def refresh_album_list(self):
         # Clear current list contents.
-        self.album_listbox.delete(0, tk.END)
-        # Loop through each album and format its display string.
-        for idx, album in enumerate(self.controller.albums):
-            album_info = (f"{idx+1}. Artist Name: {album.get('Artist Name', '')} | "
-                          f"Album: {album.get('Album', '')} | "
-                          f"Genres: {album.get('Genres', '')} | "
-                          f"Release Date: {album.get('Release Date', '')}")
-            self.album_listbox.insert(tk.END, album_info)
+        # self.album_listbox.delete(0, tk.END)
+        # # Loop through each album and format its display string.
+        # for idx, album in enumerate(self.controller.albums):
+        #     album_info = (f"{idx+1}. Artist Name: {album.get('Artist Name', '')} | "
+        #                   f"Album: {album.get('Album', '')} | "
+        #                   f"Genres: {album.get('Genres', '')} | "
+        #                   f"Release Date: {album.get('Release Date', '')}")
+        #     self.album_listbox.insert(tk.END, album_info)
+        
+        for existingAlbumItem in self.album_items:
+            existingAlbumItem.destroy()
+        
+        self.album_items.clear()
+        self.album_cover_images.clear()
+        self.selected_album = None
+
+        currentRow = 0
+        for index, album in enumerate(self.controller.albums):
+            if index > 100:
+                break
+
+            albumName = album.get("Album")
+            artistName = album.get("Artist Name")
+            genres = album.get("Genres")
+            releaseDate = album.get("Release Date")
+
+            albumItem = tk.Frame(self.list_frame, bg=NAV_BAR_SHADOW_2_COLOUR)
+            albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
+            albumItem.grid_propagate(False)
+            
+            albumCover = Image.open("Eric.png")
+            albumCover = albumCover.resize((150, 150), Image.LANCZOS)
+            albumCover = ImageTk.PhotoImage(image=albumCover)
+            
+            coverLabel = tk.Label(albumItem, image=albumCover, bg="white")
+            coverLabel.pack(side="left")
+
+            labelFrame = tk.Frame(albumItem, name="labelFrame", bg=NAV_BAR_SHADOW_2_COLOUR, width=400, height=100)
+            labelFrame.pack(fill="both", side="left", padx=(15, 15), pady=(30, 0))
+            labelFrame.pack_propagate(False)
+
+            albumNameLabel = tk.Label(labelFrame, name="albumNameLabel", text=albumName, bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 12, "bold"), anchor="w")
+            albumNameLabel.pack(fill="x")
+
+            artistNameLabel = tk.Label(labelFrame, name="artistNameLabel", text=f"By: {artistName}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+            artistNameLabel.pack(fill="x")
+
+            genresLabel = tk.Label(labelFrame, name="genresLabel", text=f"Genres: {genres}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+            genresLabel.pack(fill="x")
+
+            releaseDateLabel = tk.Label(labelFrame, name="releaseDateLabel", text=f"Released: {releaseDate}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+            releaseDateLabel.pack(fill="x")
+
+            self.album_items.append(albumItem)
+            self.album_cover_images.append(albumCover)
+
+            for thing in [albumItem, labelFrame, albumNameLabel, artistNameLabel, genresLabel, releaseDateLabel, coverLabel]:
+                thing.bind("<Button-1>", lambda event, item=albumItem: self.select_album(event, item))
+
+            currentRow += 1
+            
+    def select_album(self, event, albumItem: tk.Frame):
+        for item in self.album_items:
+            item.config(bg=NAV_BAR_SHADOW_2_COLOUR)
+            item.nametowidget("labelFrame").config(bg=NAV_BAR_SHADOW_2_COLOUR)
+
+            for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
+                item.nametowidget("labelFrame").nametowidget(widgetName).config(bg=NAV_BAR_SHADOW_2_COLOUR)
+                
+
+        albumItem.config(bg=PRIMARY_BACKGROUND_COLOUR)
+        albumItem.nametowidget("labelFrame").config(bg=PRIMARY_BACKGROUND_COLOUR)
+
+        for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
+            albumItem.nametowidget("labelFrame").nametowidget(widgetName).config(bg=PRIMARY_BACKGROUND_COLOUR)
+        
+        self.selected_album = albumItem
     
     # Opens a new window to add a new album to the catalog.
     def add_album(self):
@@ -390,11 +479,10 @@ class CatalogFrame(tk.Frame):
     
     # Opens a new window to edit the selected album's details.
     def edit_album(self):
-        selected = self.album_listbox.curselection()
-        if not selected:
+        if not self.selected_album:
             messagebox.showerror("Error", "Please select an album to edit.")
             return
-        index = selected[0]  # Get the index of the selected album.
+        index = self.album_items.index(self.selected_album)  # Get the index of the selected album.
         album = self.controller.albums[index]
         
         # Create a modal dialog for editing album details.
@@ -451,11 +539,10 @@ class CatalogFrame(tk.Frame):
     
     # Deletes the selected album after confirmation.
     def delete_album(self):
-        selected = self.album_listbox.curselection()
-        if not selected:
+        if not self.selected_album:
             messagebox.showerror("Error", "Please select an album to delete.")
             return
-        index = selected[0]
+        index = self.album_items.index(self.selected_album)
         # Ask the user to confirm deletion.
         confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete the selected album?")
         if confirm:
