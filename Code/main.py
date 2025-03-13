@@ -243,29 +243,29 @@ class SignupFrame(tk.Frame):
         email = self.email_entry.get()
         password = self.password_entry.get()
         confirm_password = self.confirm_password_entry.get()
-        
+
+        # Check if username, email, and password fields are non-empty.
+        if not username or not password or not email:
+            messagebox.showerror("Error", "Username and password cannot be empty.")
+            return
+
         # Check if the username already exists.
         if username in self.controller.users:
             messagebox.showerror("Error", "Username already exists.")
             return
-        
+
         # Check if both password entries match.
         if password != confirm_password:
             messagebox.showerror("Error", "Passwords do not match.")
             return
-        
-        # Check email is proper or valid
+
+        # Check if the email is proper or valid.
         if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email) is None:
             messagebox.showerror("Error", "Email is invalid.")
             return
-        
-        # Check if username and password fields are non-empty.
-        if not username or not password or not email:
-            messagebox.showerror("Error", "Username and password cannot be empty.")
-            return
-        
+
         # Create new user account and save to the persistent JSON file.
-        self.controller.users[username] = {"email" : email, "password": password}
+        self.controller.users[username] = {"email": email, "password": password}
         self.controller.save_users()
         messagebox.showinfo("Sign Up", "Account created successfully!")
         # Redirect user back to the login frame.
@@ -274,6 +274,7 @@ class SignupFrame(tk.Frame):
         self.username_entry.delete(0, tk.END)
         self.password_entry.delete(0, tk.END)
         self.confirm_password_entry.delete(0, tk.END)
+
 
 
 # This class produces the catalog frame. It displays a list of albums with their artist name, album name, genres, and release date.
