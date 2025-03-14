@@ -10,6 +10,8 @@ import re # for email regex
 import get_image
 from urllib.request import urlopen, Request
 import io
+import threading
+import time
 
 # Constant file names for persistent storage.
 USERS_JSON = "./users.json"  #stores user login information after they create an account.
@@ -349,6 +351,57 @@ class CatalogFrame(tk.Frame):
         logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
         logout_btn.grid(row=0, column=4, padx=5, pady=10)
     
+    def thread_function_refresh_albums(self, index, album, currentRow):
+        albumName = album.get("Album")
+        artistName = album.get("Artist Name")
+        genres = album.get("Genres")
+        releaseDate = album.get("Release Date")
+
+        albumItem = tk.Frame(self.list_frame, bg=NAV_BAR_SHADOW_2_COLOUR)
+        albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
+        albumItem.grid_propagate(False)
+        
+        albumURL = album.get("Cover URL")
+        albumCover = Image.open("Eric.png")
+        if albumURL != "" and albumURL != None:
+            try:
+                req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
+                response = urlopen(req)
+
+                albumCoverData = response.read()
+                albumCover = Image.open(io.BytesIO(albumCoverData))
+            
+            except Exception as e:
+                print(f"Failed to load album cover: {e}")
+
+        albumCover = albumCover.resize((150, 150), Image.LANCZOS)
+        albumCover = ImageTk.PhotoImage(image=albumCover)
+        
+        coverLabel = tk.Label(albumItem, image=albumCover, bg="white")
+        coverLabel.pack(side="left")
+
+        labelFrame = tk.Frame(albumItem, name="labelFrame", bg=NAV_BAR_SHADOW_2_COLOUR, width=400, height=100)
+        labelFrame.pack(fill="both", side="left", padx=(15, 15), pady=(30, 0))
+        labelFrame.pack_propagate(False)
+
+        albumNameLabel = tk.Label(labelFrame, name="albumNameLabel", text=albumName, bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 12, "bold"), anchor="w")
+        albumNameLabel.pack(fill="x")
+
+        artistNameLabel = tk.Label(labelFrame, name="artistNameLabel", text=f"By: {artistName}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+        artistNameLabel.pack(fill="x")
+
+        genresLabel = tk.Label(labelFrame, name="genresLabel", text=f"Genres: {genres}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+        genresLabel.pack(fill="x")
+
+        releaseDateLabel = tk.Label(labelFrame, name="releaseDateLabel", text=f"Released: {releaseDate}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+        releaseDateLabel.pack(fill="x")
+
+        self.album_items.append(albumItem)
+        self.album_cover_images.append(albumCover)
+
+        for thing in [albumItem, labelFrame, albumNameLabel, artistNameLabel, genresLabel, releaseDateLabel, coverLabel]:
+            thing.bind("<Button-1>", lambda event, item=albumItem: self.select_album(event, item))
+
     # Refreshes the album list display to show the current album data.
     def refresh_album_list(self):
         # Clear current list contents.
@@ -367,60 +420,16 @@ class CatalogFrame(tk.Frame):
         self.album_items.clear()
         self.album_cover_images.clear()
         self.selected_album = None
+        self.refresh_album_threads = []
 
         currentRow = 0
         for index, album in enumerate(self.controller.albums):
-            albumName = album.get("Album")
-            artistName = album.get("Artist Name")
-            genres = album.get("Genres")
-            releaseDate = album.get("Release Date")
-
-            albumItem = tk.Frame(self.list_frame, bg=NAV_BAR_SHADOW_2_COLOUR)
-            albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
-            albumItem.grid_propagate(False)
-            
-            albumURL = album.get("Cover URL")
-            albumCover = Image.open("Eric.png")
-            if albumURL != "" and albumURL != None:
-                try:
-                    req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
-                    response = urlopen(req)
-
-                    albumCoverData = response.read()
-                    albumCover = Image.open(io.BytesIO(albumCoverData))
-                
-                except Exception as e:
-                    print(f"Failed to load album cover: {e}")
-
-            albumCover = albumCover.resize((150, 150), Image.LANCZOS)
-            albumCover = ImageTk.PhotoImage(image=albumCover)
-            
-            coverLabel = tk.Label(albumItem, image=albumCover, bg="white")
-            coverLabel.pack(side="left")
-
-            labelFrame = tk.Frame(albumItem, name="labelFrame", bg=NAV_BAR_SHADOW_2_COLOUR, width=400, height=100)
-            labelFrame.pack(fill="both", side="left", padx=(15, 15), pady=(30, 0))
-            labelFrame.pack_propagate(False)
-
-            albumNameLabel = tk.Label(labelFrame, name="albumNameLabel", text=albumName, bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 12, "bold"), anchor="w")
-            albumNameLabel.pack(fill="x")
-
-            artistNameLabel = tk.Label(labelFrame, name="artistNameLabel", text=f"By: {artistName}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
-            artistNameLabel.pack(fill="x")
-
-            genresLabel = tk.Label(labelFrame, name="genresLabel", text=f"Genres: {genres}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
-            genresLabel.pack(fill="x")
-
-            releaseDateLabel = tk.Label(labelFrame, name="releaseDateLabel", text=f"Released: {releaseDate}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
-            releaseDateLabel.pack(fill="x")
-
-            self.album_items.append(albumItem)
-            self.album_cover_images.append(albumCover)
-
-            for thing in [albumItem, labelFrame, albumNameLabel, artistNameLabel, genresLabel, releaseDateLabel, coverLabel]:
-                thing.bind("<Button-1>", lambda event, item=albumItem: self.select_album(event, item))
-
+            thread = threading.Thread(target=self.thread_function_refresh_albums, args=[index, album, currentRow])
+            self.refresh_album_threads.append(thread)
             currentRow += 1
+        
+        for thread in self.refresh_album_threads:
+            thread.start()
             
     def select_album(self, event, albumItem: tk.Frame):
         for item in self.album_items:
