@@ -26,7 +26,8 @@ plot: $(DATA_DIR)/cleaned_music_data.csv
 
 # Clean up temporary files
 clean:
-	rm -rf __pycache__ *.pyc $(DATA_DIR)/cleaned_music_data.csv
+    @echo "Are you sure you want to clean? (y/n)"
+    @read ans && [ "$$ans" = "y" ] && rm -rf __pycache__ *.csv
 
 # Phony targets (not associated with actual files)
 .PHONY: all install process plot test clean
