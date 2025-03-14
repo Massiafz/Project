@@ -28,18 +28,19 @@ def get_album_cover(album, artist):
     return None
 
 # Iterate through albums with delay
-for index, row in df.iterrows():
-    if pd.notna(row.get("Cover URL")) and row["Cover URL"].startswith("http"):
-        print(f"Skipping {row['Album']} - Cover already exists.")
-        continue  # Skip albums with a cover
+if __name__ == "__main__":
+    for index, row in df.iterrows():
+        if pd.notna(row.get("Cover URL")) and row["Cover URL"].startswith("http"):
+            print(f"Skipping {row['Album']} - Cover already exists.")
+            continue  # Skip albums with a cover
 
-    cover_url = get_album_cover(row["Album"], row["Artist Name"])
-    df.at[index, "Cover URL"] = cover_url
-    
-    print(f"Fetched cover for {row['Album']}: {cover_url}")
+        cover_url = get_album_cover(row["Album"], row["Artist Name"])
+        df.at[index, "Cover URL"] = cover_url
+        
+        print(f"Fetched cover for {row['Album']}: {cover_url}")
 
-    
-    time.sleep(1)  
+        
+        time.sleep(1)  
 
-# Save updated CSV
-df.to_csv("cleaned_music_data.csv", index=False)
+    # Save updated CSV
+    df.to_csv("cleaned_music_data.csv", index=False)

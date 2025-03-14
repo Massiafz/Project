@@ -7,6 +7,9 @@ import json  #to handle JSON file reading/writing
 import os  #for operating system file/path interactions
 from PIL import Image, ImageTk #for album image editing
 import re # for email regex
+import get_image
+from urllib.request import urlopen, Request
+import io
 
 # Constant file names for persistent storage.
 USERS_JSON = "./users.json"  #stores user login information after they create an account.
@@ -123,7 +126,8 @@ class AlbumCatalogApp(tk.Tk):  #inherits from tk.Tk. This is the main applicatio
                         "Genres": row.get("Genres", "").strip(),
                         "Average Rating": row.get("Average Rating", "").strip(),
                         "Number of Ratings": row.get("Number of Ratings", "").strip(),
-                        "Number of Reviews": row.get("Number of Reviews", "").strip()
+                        "Number of Reviews": row.get("Number of Reviews", "").strip(),
+                        "Cover URL": row.get("Cover URL", "").strip()
                     }
                     albums.append(album)
         else: 
@@ -366,9 +370,6 @@ class CatalogFrame(tk.Frame):
 
         currentRow = 0
         for index, album in enumerate(self.controller.albums):
-            if index > 100:
-                break
-
             albumName = album.get("Album")
             artistName = album.get("Artist Name")
             genres = album.get("Genres")
@@ -378,7 +379,19 @@ class CatalogFrame(tk.Frame):
             albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
             albumItem.grid_propagate(False)
             
+            albumURL = album.get("Cover URL")
             albumCover = Image.open("Eric.png")
+            if albumURL != "" and albumURL != None:
+                try:
+                    req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
+                    response = urlopen(req)
+
+                    albumCoverData = response.read()
+                    albumCover = Image.open(io.BytesIO(albumCoverData))
+                
+                except Exception as e:
+                    print(f"Failed to load album cover: {e}")
+
             albumCover = albumCover.resize((150, 150), Image.LANCZOS)
             albumCover = ImageTk.PhotoImage(image=albumCover)
             
