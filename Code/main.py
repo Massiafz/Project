@@ -4,6 +4,7 @@
 import tkinter as tk                      # Tkinter: Python's standard GUI toolkit for building graphical interfaces.
 from tkinter import messagebox            # For displaying pop-up messages (information, warnings, errors).
 from tkinter import ttk                   # For themed widgets that provide a modern look and feel.
+from tkinter import filedialog
 import csv                                # To handle reading from and writing to CSV files (used for album data).
 import json                               # To handle reading from and writing to JSON files (used for user account data).
 import os                                 # For interacting with the operating system (e.g., checking file existence).
@@ -11,6 +12,7 @@ from PIL import Image, ImageTk            # Pillow (PIL) for image processing an
 import re                                 # Regular expressions for validating email formats.
 from urllib.request import urlopen, Request # For making HTTP requests (e.g., downloading album cover images).
 import io                                 # For handling I/O operations such as byte streams (used for image data).
+import threading
 
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
@@ -126,6 +128,25 @@ class AlbumCatalogApp(tk.Tk):
     def save_users(self):
         with open(USERS_JSON, "w") as f:
             json.dump(self.users, f, indent=4)
+    
+    def save_albums(self):
+        with open(ALBUMS_CSV, "w", newline="", encoding="utf-8") as csvfile:
+            writer = csv.DictWriter(csvfile, ["Ranking","Album","Artist Name","Release Date","Genres","Average Rating","Number of Ratings","Number of Reviews","Cover URL"])
+            writer.writeheader()
+            
+            for album in self.albums:
+                writer.writerow({
+                    "Ranking": album["Ranking"],
+                    "Album": album["Album"],
+                    "Artist Name": album["Artist Name"],
+                    "Release Date": album["Release Date"],
+                    "Genres": album["Genres"],
+                    "Average Rating": album["Average Rating"],
+                    "Number of Ratings": album["Number of Ratings"],
+                    "Number of Reviews": album["Number of Reviews"],
+                    "Cover URL": album["Cover URL"]
+                })
+
 
     def load_albums_from_csv(self):
         albums = []
@@ -344,76 +365,111 @@ class CatalogFrame(tk.Frame):
         logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
         logout_btn.grid(row=0, column=4, padx=5, pady=10)
     
-    def refresh_album_list(self):
-        # Clear existing album items.
-        for existingAlbumItem in self.album_items:
-            existingAlbumItem.destroy()
+    def thread_function_refresh_albums(self, index, album, currentRow):
+        albumName = album.get("Album")
+        artistName = album.get("Artist Name")
+        genres = album.get("Genres")
+        releaseDate = album.get("Release Date")
+
+        albumItem = tk.Frame(self.list_frame, bg=NAV_BAR_SHADOW_2_COLOUR)
+        albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
+        albumItem.grid_propagate(False)
         
-        self.album_items.clear()
-        self.album_cover_images.clear()
+        albumCover = Image.open("Eric.png")
+        albumURL = album.get("Cover URL")
+
+        url_pattern = re.compile(
+            r'^(https?|ftp):\/\/'  # Match 'http://', 'https://', or 'ftp://'
+            r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z]{2,6}'  # Domain name
+            r'\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$'  # Additional URL components
+        )
+
+        if not url_pattern.match(albumURL) and albumURL != "" and albumURL != None:
+            albumCover = Image.open(albumURL)
+        
+        elif albumURL != "" and albumURL != None:
+            try:
+                req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
+                response = urlopen(req)
+
+                albumCoverData = response.read()
+                albumCover = Image.open(io.BytesIO(albumCoverData))
+            
+            except Exception as e:
+                print(f"Failed to load album cover: {e}")
+
+        albumCover = albumCover.resize((150, 150), Image.LANCZOS)
+        albumCover = ImageTk.PhotoImage(image=albumCover)
+        
+        coverLabel = tk.Label(albumItem, image=albumCover, bg="white")
+        coverLabel.pack(side="left")
+
+        labelFrame = tk.Frame(albumItem, name="labelFrame", bg=NAV_BAR_SHADOW_2_COLOUR, width=400, height=100)
+        labelFrame.pack(fill="both", side="left", padx=(15, 15), pady=(30, 0))
+        labelFrame.pack_propagate(False)
+
+        albumNameLabel = tk.Label(labelFrame, name="albumNameLabel", text=albumName, bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 12, "bold"), anchor="w")
+        albumNameLabel.pack(fill="x")
+
+        artistNameLabel = tk.Label(labelFrame, name="artistNameLabel", text=f"By: {artistName}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+        artistNameLabel.pack(fill="x")
+
+        genresLabel = tk.Label(labelFrame, name="genresLabel", text=f"Genres: {genres}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+        genresLabel.pack(fill="x")
+
+        releaseDateLabel = tk.Label(labelFrame, name="releaseDateLabel", text=f"Released: {releaseDate}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
+        releaseDateLabel.pack(fill="x")
+
+        self.album_items[index] = albumItem
+        self.album_cover_images[index] = albumCover
+
+        for thing in [albumItem, labelFrame, albumNameLabel, artistNameLabel, genresLabel, releaseDateLabel, coverLabel]:
+            thing.bind("<Button-1>", lambda event, item=albumItem: self.select_album(event, item))
+
+    # Refreshes the album list display to show the current album data.
+    def refresh_album_list(self):
+        # for thread in self.refresh_album_threads:
+        
+        self.refresh_album_threads = []
+
+        for existingAlbumItem in self.album_items:
+            if existingAlbumItem != None:
+                existingAlbumItem.destroy()
+        
+        self.album_items = []
+
+        for i in range(len(self.controller.albums)):
+            self.album_items.append(None)
+
+        self.album_cover_images = []
+
+        for i in range(len(self.controller.albums)):
+            self.album_cover_images.append(None)
+
         self.selected_album = None
 
         currentRow = 0
         for index, album in enumerate(self.controller.albums):
-            albumName = album.get("Album")
-            artistName = album.get("Artist Name")
-            genres = album.get("Genres")
-            releaseDate = album.get("Release Date")
-
-            albumItem = tk.Frame(self.list_frame, bg=NAV_BAR_SHADOW_2_COLOUR)
-            albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
-            albumItem.grid_propagate(False)
-            
-            albumURL = album.get("Cover URL")
-            albumCover = Image.open("Eric.png")
-            if albumURL != "" and albumURL is not None:
-                try:
-                    req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
-                    response = urlopen(req)
-                    albumCoverData = response.read()
-                    albumCover = Image.open(io.BytesIO(albumCoverData))
-                except Exception as e:
-                    print(f"Failed to load album cover: {e}")
-
-            albumCover = albumCover.resize((150, 150), Image.LANCZOS)
-            albumCover = ImageTk.PhotoImage(image=albumCover)
-            
-            coverLabel = tk.Label(albumItem, image=albumCover, bg="white")
-            coverLabel.pack(side="left")
-
-            labelFrame = tk.Frame(albumItem, name="labelFrame", bg=NAV_BAR_SHADOW_2_COLOUR, width=400, height=100)
-            labelFrame.pack(fill="both", side="left", padx=(15, 15), pady=(30, 0))
-            labelFrame.pack_propagate(False)
-
-            albumNameLabel = tk.Label(labelFrame, name="albumNameLabel", text=albumName, bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 12, "bold"), anchor="w")
-            albumNameLabel.pack(fill="x")
-
-            artistNameLabel = tk.Label(labelFrame, name="artistNameLabel", text=f"By: {artistName}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
-            artistNameLabel.pack(fill="x")
-
-            genresLabel = tk.Label(labelFrame, name="genresLabel", text=f"Genres: {genres}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
-            genresLabel.pack(fill="x")
-
-            releaseDateLabel = tk.Label(labelFrame, name="releaseDateLabel", text=f"Released: {releaseDate}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica", 10, "bold"), anchor="w")
-            releaseDateLabel.pack(fill="x")
-
-            self.album_items.append(albumItem)
-            self.album_cover_images.append(albumCover)
-
-            for thing in [albumItem, labelFrame, albumNameLabel, artistNameLabel, genresLabel, releaseDateLabel, coverLabel]:
-                thing.bind("<Button-1>", lambda event, item=albumItem: self.select_album(event, item))
-
+            thread = threading.Thread(target=self.thread_function_refresh_albums, args=[index, album, currentRow], daemon=True)
+            self.refresh_album_threads.append(thread)
             currentRow += 1
+        
+        for thread in self.refresh_album_threads:
+            thread.start()
             
     def select_album(self, event, albumItem: tk.Frame):
         for item in self.album_items:
-            item.config(bg=NAV_BAR_SHADOW_2_COLOUR)
-            item.nametowidget("labelFrame").config(bg=NAV_BAR_SHADOW_2_COLOUR)
-            for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
-                item.nametowidget("labelFrame").nametowidget(widgetName).config(bg=NAV_BAR_SHADOW_2_COLOUR)
+            if item != None:
+                item.config(bg=NAV_BAR_SHADOW_2_COLOUR)
+                item.nametowidget("labelFrame").config(bg=NAV_BAR_SHADOW_2_COLOUR)
+
+                for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
+                    item.nametowidget("labelFrame").nametowidget(widgetName).config(bg=NAV_BAR_SHADOW_2_COLOUR)
                 
+
         albumItem.config(bg=PRIMARY_BACKGROUND_COLOUR)
         albumItem.nametowidget("labelFrame").config(bg=PRIMARY_BACKGROUND_COLOUR)
+
         for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
             albumItem.nametowidget("labelFrame").nametowidget(widgetName).config(bg=PRIMARY_BACKGROUND_COLOUR)
         
@@ -440,26 +496,56 @@ class CatalogFrame(tk.Frame):
         ttk.Label(add_win, text="Genres:").grid(row=3, column=0, padx=5, pady=5, sticky="e")
         genres_entry = ttk.Entry(add_win)
         genres_entry.grid(row=3, column=1, padx=5, pady=5)
+
+        self.current_file_path = ""
+        def open_filedialog_album_cover():
+            self.current_file_path = filedialog.askopenfilename(title="Select a File", filetypes=[("Image Files", ["*.png", "*.jpg", "*.jpeg", "*.gif"]), ("All Files", "*.*")], initialdir="./album_covers")
+            
+            if self.current_file_path:
+                self.current_file_path = os.path.relpath(self.current_file_path, start=os.getcwd())
+                file_label.config(text=f"Selected file: {self.current_file_path}")
+            
+            else:
+                file_label.config(text="No file selected.")
+
+        ttk.Label(add_win, text="Album Cover:").grid(row=4, column=0, padx=5, pady=5, sticky="e")
+        album_url_entry = ttk.Entry(add_win)
+        album_url_entry.grid(row=4, column=1, padx=5, pady=5)
+        album_image_entry = ttk.Button(add_win, text="Import File", command=open_filedialog_album_cover)
+        album_image_entry.grid(row=4, column=2, padx=5, pady=5)
+        file_label = tk.Label(add_win, text="No file selected.")
+        file_label.grid(row=4, column=3, padx=5, pady=5)
         
         def save_album():
             artist = artist_entry.get().strip()
             album_name = album_entry.get().strip()
             release_date = release_entry.get().strip()
             genres = genres_entry.get().strip()
+            cover_url = album_url_entry.get().strip()
+
+            if self.current_file_path != "":
+                cover_url = self.current_file_path
+
             if not artist or not album_name or not release_date:
                 messagebox.showerror("Error", "Artist Name, Album, and Release Date are required.")
                 return
             new_album = {
+                "Ranking": 0,
                 "Artist Name": artist,
                 "Album": album_name,
                 "Release Date": release_date,
-                "Genres": genres
+                "Genres": genres,
+                "Average Rating": 0,
+                "Number of Ratings": 0,
+                "Number of Reviews": 0,
+                "Cover URL": cover_url
             }
             self.controller.albums.append(new_album)
+            self.controller.save_albums()
             self.refresh_album_list()
             add_win.destroy()
         
-        ttk.Button(add_win, text="Save Album", command=save_album).grid(row=4, column=0, columnspan=2, pady=10)
+        ttk.Button(add_win, text="Save Album", command=save_album).grid(row=5, column=0, columnspan=2, pady=10)
     
     def edit_album(self):
         if not self.selected_album:
@@ -492,25 +578,69 @@ class CatalogFrame(tk.Frame):
         genres_entry = ttk.Entry(edit_win)
         genres_entry.insert(0, album.get("Genres", ""))
         genres_entry.grid(row=3, column=1, padx=5, pady=5)
+
+        self.current_file_path = ""
+        def open_filedialog_album_cover():
+            self.current_file_path = filedialog.askopenfilename(title="Select a File", filetypes=[("Image Files", ["*.png", "*.jpg", "*.jpeg", "*.gif"]), ("All Files", "*.*")], initialdir="./album_covers")
+            
+            if self.current_file_path:
+                self.current_file_path = os.path.relpath(self.current_file_path, start=os.getcwd())
+                file_label.config(text=f"Selected file: {self.current_file_path}")
+            
+            else:
+                file_label.config(text="No file selected.")
+
+        ttk.Label(edit_win, text="Album Cover:").grid(row=4, column=0, padx=5, pady=5, sticky="e")
+        album_url_entry = ttk.Entry(edit_win)
+        album_url_entry.grid(row=4, column=1, padx=5, pady=5)
+        album_image_entry = ttk.Button(edit_win, text="Import File", command=open_filedialog_album_cover)
+        album_image_entry.grid(row=4, column=2, padx=5, pady=5)
+        file_label = tk.Label(edit_win, text="No file selected.")
+        file_label.grid(row=4, column=3, padx=5, pady=5)
+
+        url_pattern = re.compile(
+            r'^(https?|ftp):\/\/'  # Match 'http://', 'https://', or 'ftp://'
+            r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z]{2,6}'  # Domain name
+            r'\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$'  # Additional URL components
+        )
+
+        if url_pattern.match(album.get("Cover URL", "")):
+            album_url_entry.insert(0, album.get("Cover URL", ""))
+        
+        elif album.get("Cover URL", "") != "" and album.get("Cover URL", "") != None:
+            self.current_file_path = album.get("Cover URL", "")
+            file_label.config(text=f"Selected file: {self.current_file_path}")
         
         def update_album():
             updated_artist = artist_entry.get().strip()
             updated_album = album_entry.get().strip()
             updated_release = release_entry.get().strip()
             updated_genres = genres_entry.get().strip()
+            cover_url = album_url_entry.get().strip()
+
+            if self.current_file_path != "":
+                cover_url = self.current_file_path
+            
             if not updated_artist or not updated_album or not updated_release:
                 messagebox.showerror("Error", "Artist Name, Album, and Release Date are required.")
                 return
+            
             self.controller.albums[index] = {
+                "Ranking": album["Ranking"],
                 "Artist Name": updated_artist,
                 "Album": updated_album,
                 "Release Date": updated_release,
-                "Genres": updated_genres
+                "Genres": updated_genres,
+                "Average Rating": album["Average Rating"],
+                "Number of Ratings": album["Number of Ratings"],
+                "Number of Reviews": album["Number of Reviews"],
+                "Cover URL": cover_url
             }
+            self.controller.save_albums()
             self.refresh_album_list()
             edit_win.destroy()
         
-        ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=4, column=0, columnspan=2, pady=10)
+        ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=5, column=0, columnspan=2, pady=10)
     
     def delete_album(self):
         if not self.selected_album:
@@ -520,6 +650,7 @@ class CatalogFrame(tk.Frame):
         confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete the selected album?")
         if confirm:
             del self.controller.albums[index]
+            self.controller.save_albums()
             self.refresh_album_list()
     
     def edit_account(self):
