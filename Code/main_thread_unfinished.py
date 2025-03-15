@@ -7,7 +7,6 @@ import json  #to handle JSON file reading/writing
 import os  #for operating system file/path interactions
 from PIL import Image, ImageTk #for album image editing
 import re # for email regex
-import get_image
 from urllib.request import urlopen, Request
 import io
 import threading
@@ -503,7 +502,7 @@ class CatalogFrame(tk.Frame):
                 "Album": album_name,
                 "Release Date": release_date,
                 "Genres": genres,
-                "Cover URL" : self.controller.albums[index]["Cover URL"]
+                "Cover URL" : ""
             }
             # Append the new album to the album list in the controller.
             self.controller.albums.append(new_album)
