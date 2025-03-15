@@ -502,7 +502,8 @@ class CatalogFrame(tk.Frame):
                 "Artist Name": artist,
                 "Album": album_name,
                 "Release Date": release_date,
-                "Genres": genres
+                "Genres": genres,
+                "Cover URL" : self.controller.albums[index]["Cover URL"]
             }
             # Append the new album to the album list in the controller.
             self.controller.albums.append(new_album)
@@ -564,7 +565,8 @@ class CatalogFrame(tk.Frame):
                 "Artist Name": updated_artist,
                 "Album": updated_album,
                 "Release Date": updated_release,
-                "Genres": updated_genres
+                "Genres": updated_genres,
+                "Cover URL" : self.controller.albums[index]["Cover URL"]
             }
             # Refresh the album list display.
             self.refresh_album_list()
