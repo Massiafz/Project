@@ -17,7 +17,7 @@ import threading
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
 # ---------------------------------------------------------------------------
-USERS_JSON = "./users.json"               # JSON file that stores user login information.
+USERS_JSON = "Code/users.json"               # JSON file that stores user login information.
 ALBUMS_CSV = "Code/cleaned_music_data.csv"       # CSV file containing album catalog data.
 
 # Define colour constants for UI consistency
@@ -80,9 +80,9 @@ class AlbumCatalogApp(tk.Tk):
         title.pack(anchor="w", padx=5, pady=40)
         
         # Place search bar and button to the right
-        self.search_button = tk.Button(nav_bar,text="Search",command=self.search)
+        search_button = tk.Button(nav_bar,text="Search",command=self.search)
         # search_button = tk.Button(nav_bar,text="Search")
-        self.search_button.pack(side="right", padx=10)
+        search_button.pack(side="right", padx=10)
         
         self.search_bar = tk.Text(nav_bar, 
                          font=("Calibri",12),
@@ -179,7 +179,7 @@ class AlbumCatalogApp(tk.Tk):
                     }
                     if search_query == None:
                         albums.append(album)
-                    elif search_query in album.get("Album") or search_query in album.get("Artist Name"):
+                    elif search_query.lower().strip() in album.get("Album").lower() or search_query.lower().strip() in album.get("Artist Name").lower():
                         albums.append(album)
         else:
             print("The file does not exist.")
@@ -192,8 +192,11 @@ class AlbumCatalogApp(tk.Tk):
         frame.tkraise()
 
     def search(self):
-        input = self.search_bar.get("1.0")
-        self.load_albums_from_csv(input)
+        query = self.search_bar.get("1.0", tk.END)
+        self.albums = self.load_albums_from_csv(query)
+        frame = self.frames["CatalogFrame"]
+        frame.refresh_album_list()
+        frame.tkraise()
 
 # ---------------------------------------------------------------------------
 # LoginFrame: The login page that allows users to sign in or continue as a guest.
@@ -408,6 +411,7 @@ class CatalogFrame(tk.Frame):
         elif albumURL != "" and albumURL != None:
             try:
                 req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
+                
                 response = urlopen(req)
 
                 albumCoverData = response.read()
