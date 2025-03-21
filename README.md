@@ -81,7 +81,14 @@ A challenge we are facing is figuring out how to prepare and add the album image
 Some ways to address this would be to either download the album images individually or to use an API for efficiency.
 
 ### Iteration 2
-> *(Not yet started)* -> Plans include: CRUD operations on albums, searching, filtering, album images
+- Worked on the following tasks...
+- Adding Images for album covers
+- Final changed to CSV (after editing, adding, or deleting)
+- Searching for songs
+- Guest Account
+- Database/Build
+- Multi-threading
+- UI Updates
 
 ### Iteration 3
 > *(Not yet started)* -> Plans include: Personalized recommendations, song sample playback
