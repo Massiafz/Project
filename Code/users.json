@@ -9,5 +9,9 @@
     "bach": {
         "email": "bbb@gmail.cc",
         "password": "111"
+    },
+    "moksh": {
+        "email": "moksh@goat.com",
+        "password": "zzz"
     }
 }

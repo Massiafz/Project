@@ -1,7 +1,4 @@
 Ranking,Album,Artist Name,Release Date,Genres,Average Rating,Number of Ratings,Number of Reviews,Cover URL
-1,OK Computer,Radiohead,1997-06-16,"Alternative Rock, Art Rock",4.23,70382,1531,https://i.discogs.com/VnYA9gk2yWIQtPwljiI9I4_d_lXODBY582RquPzs_sg/rs:fit/g:sm/q:90/h:609/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1ODcx/NjgtMTY0NzQ0NTg0/My00ODU0LmpwZWc.jpeg
-2,Wish You Were Here,Pink Floyd,1975-09-12,"Progressive Rock, Art Rock",4.29,48662,983,https://i.discogs.com/_1djgr_cmgajmivwJDVN5Y7Zv4HA8wtUAn51vmbujs4/rs:fit/g:sm/q:90/h:596/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQ2MzU5/Ny0xNjc1ODg2OTE1/LTIxMTQuanBlZw.jpeg
-4,Kid A,Radiohead,2000-10-03,"Art Rock, Experimental Rock, Electronic",4.21,58590,734,https://i.discogs.com/_zg0Us0N_anqCz9hJvFGeRK2v69eDDCxQnHkd7RcgTk/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTc0NzQz/LTE1NDg5MDI2NDMt/Mzg2OS5qcGVn.jpeg
 5,To Pimp a Butterfly,Kendrick Lamar,2015-03-15,"Conscious Hip Hop, West Coast Hip Hop, Jazz Rap",4.27,44206,379,https://i.discogs.com/mzZN2JyPeiMrz8YnZd04bKifNZ36K5zMECcfHvnTzFk/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTc1NTc5/NTctMTQ0Mzk4MjAy/NC01NTk2LmpwZWc.jpeg
 6,Loveless,My Bloody Valentine,1991-11-04,"Shoegaze, Noise Pop",4.24,49887,1223,https://i.discogs.com/9nhTFx4kXHxywSi3CNHALtff0rc-a1zYMPjq58TmY5k/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTg0ODI1/LTEyMzQ5NjU3Mjgu/anBlZw.jpeg
 7,The Dark Side of the Moon,Pink Floyd,1973-03-23,"Art Rock, Progressive Rock",4.2,57622,1549,https://i.discogs.com/1fwskTLM6cfxbdNmBDJ8expl6wab0tEgxvuloLIqKh8/rs:fit/g:sm/q:90/h:596/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTkyODc4/MDktMTQ3OTc1MzIz/Ni05NjE3LmpwZWc.jpeg
@@ -100,3 +97,4 @@ Ranking,Album,Artist Name,Release Date,Genres,Average Rating,Number of Ratings,N
 100,Donuts,J Dilla,2006-02-07,Instrumental Hip Hop,4.06,18830,260,https://i.discogs.com/pBc8jM2dStF9OLVBHOr-fMzHc_1OYAqn0bpBaCNuUuE/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTYxOTg3/Mi0xNDAzMjc2OTky/LTQ1MjIuanBlZw.jpeg
 0,Massi's Glazing,Massi,2025,Amita,0,0,0,BrightByteLogo.png
 0,Bright Bytes,BrightByte,2025,Eric,0,0,0,BrightByteLogo.png
+0,test,test,moksh,test,0,0,0,

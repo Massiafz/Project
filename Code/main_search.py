@@ -17,8 +17,8 @@ import threading
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
 # ---------------------------------------------------------------------------
-USERS_JSON = "Code/users.json"               # JSON file that stores user login information.
-ALBUMS_CSV = "Code/cleaned_music_data.csv"       # CSV file containing album catalog data.
+USERS_JSON = "users.json"               # JSON file that stores user login information.
+ALBUMS_CSV = "cleaned_music_data.csv"       # CSV file containing album catalog data.
 
 # Define colour constants for UI consistency
 PRIMARY_BACKGROUND_COLOUR = "#527cc5"       # Primary background colour for the app.
@@ -47,7 +47,7 @@ class AlbumCatalogApp(tk.Tk):
         # Load and set the window icon/logo.
         # Open the logo image, crop it to the desired area, resize it, and then set it as the window icon.
         # -----------------------------------------------------------------------
-        image = Image.open("Code/BrightByteLogo.png")
+        image = Image.open("BrightByteLogo.png")
         image = image.crop((0, 1080 * 0.25, 1080, 1080 * 0.75))
         image = image.resize((125, 75), Image.LANCZOS)
         self.image = ImageTk.PhotoImage(image)
@@ -80,16 +80,16 @@ class AlbumCatalogApp(tk.Tk):
         title.pack(anchor="w", padx=5, pady=40)
         
         # Place search bar and button to the right
-        search_button = tk.Button(nav_bar,text="Search",command=self.search)
-        # search_button = tk.Button(nav_bar,text="Search")
-        search_button.pack(side="right", padx=10)
+        self.search_button = tk.Button(nav_bar,text="Search",command=self.search)
+        # self.search_button = tk.Button(nav_bar,text="Search")
+        self.search_button.pack_forget()
         
         self.search_bar = tk.Text(nav_bar, 
                          font=("Calibri",12),
                          height=1, 
                          width=50
         )
-        self.search_bar.pack(side="right")
+        self.search_bar.pack_forget()
         
         # -----------------------------------------------------------------------
         # Set up ttk styling for a modern look.
@@ -108,7 +108,8 @@ class AlbumCatalogApp(tk.Tk):
         self.users = self.load_users()
         self.current_user = None
         
-        self.albums = self.load_albums_from_csv(None)
+        self.search_results = None
+        self.albums = self.load_albums_from_csv()
         
         # -----------------------------------------------------------------------
         # Create a container frame to hold the various application pages.
@@ -160,7 +161,7 @@ class AlbumCatalogApp(tk.Tk):
                 })
 
 
-    def load_albums_from_csv(self, search_query):
+    def load_albums_from_csv(self):
         albums = []
         if os.path.exists(ALBUMS_CSV):
             with open(ALBUMS_CSV, newline="", encoding="utf-8") as csvfile:
@@ -177,13 +178,22 @@ class AlbumCatalogApp(tk.Tk):
                         "Number of Reviews": row.get("Number of Reviews", "").strip(),
                         "Cover URL": row.get("Cover URL", "").strip()
                     }
-                    if search_query == None:
-                        albums.append(album)
-                    elif search_query.lower().strip() in album.get("Album").lower() or search_query.lower().strip() in album.get("Artist Name").lower():
-                        albums.append(album)
+
+                    albums.append(album)
         else:
             print("The file does not exist.")
         return albums
+    
+    def load_search_query(self, search_query):
+        self.search_results = []
+        
+        self.search_results = list(filter(
+            lambda album: search_query == None or 
+                            search_query.lower().strip() in album.get("Album").lower() or
+                            search_query.lower().strip() in album.get("Artist Name").lower() or
+                            search_query.lower().strip() in album.get("Release Date").split("-"),
+            self.albums.copy()
+        ))
     
     def show_frame(self, frame_name):
         frame = self.frames[frame_name]
@@ -191,11 +201,14 @@ class AlbumCatalogApp(tk.Tk):
             frame.refresh_album_list()
         frame.tkraise()
 
-    def search(self):
+    def search(self, no_refresh = False):
         query = self.search_bar.get("1.0", tk.END)
-        self.albums = self.load_albums_from_csv(query)
+        self.load_search_query(query)
         frame = self.frames["CatalogFrame"]
-        frame.refresh_album_list()
+
+        if not no_refresh:
+            frame.refresh_album_list()
+        
         frame.tkraise()
 
 # ---------------------------------------------------------------------------
@@ -244,6 +257,8 @@ class LoginFrame(tk.Frame):
             self.controller.show_frame("CatalogFrame")
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
+            self.controller.search_button.pack(side="right", padx=10)
+            self.controller.search_bar.pack(side="right")
         else:
             messagebox.showerror("Error", "Invalid username or password.")
     
@@ -254,6 +269,8 @@ class LoginFrame(tk.Frame):
     def continue_as_guest(self):
         self.controller.current_user = "Guest"
         messagebox.showinfo("Guest Login", "Continuing as guest.")
+        self.controller.search_button.pack(side="right", padx=10)
+        self.controller.search_bar.pack(side="right")
         self.controller.show_frame("CatalogFrame")
 
 
@@ -396,7 +413,7 @@ class CatalogFrame(tk.Frame):
         albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
         albumItem.grid_propagate(False)
         
-        albumCover = Image.open("Code/Eric.png")
+        albumCover = Image.open("Eric.png")
         albumURL = album.get("Cover URL")
 
         url_pattern = re.compile(
@@ -460,18 +477,24 @@ class CatalogFrame(tk.Frame):
         
         self.album_items = []
 
-        for i in range(len(self.controller.albums)):
+        self.controller.search(True)
+
+        self.album_arr_to_use = self.controller.albums
+        if self.controller.search_results != None:
+            self.album_arr_to_use = self.controller.search_results
+
+        for i in range(len(self.album_arr_to_use)):
             self.album_items.append(None)
 
         self.album_cover_images = []
 
-        for i in range(len(self.controller.albums)):
+        for i in range(len(self.album_arr_to_use)):
             self.album_cover_images.append(None)
 
         self.selected_album = None
 
         currentRow = 0
-        for index, album in enumerate(self.controller.albums):
+        for index, album in enumerate(self.album_arr_to_use):
             thread = threading.Thread(target=self.thread_function_refresh_albums, args=[index, album, currentRow], daemon=True)
             self.refresh_album_threads.append(thread)
             currentRow += 1
@@ -740,6 +763,8 @@ class CatalogFrame(tk.Frame):
     def logout(self):
         self.controller.current_user = None
         messagebox.showinfo("Logout", "You have been logged out.")
+        self.controller.search_button.pack_forget()
+        self.controller.search_bar.pack_forget()
         self.controller.show_frame("LoginFrame")
 
 # ---------------------------------------------------------------------------
