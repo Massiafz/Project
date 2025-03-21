@@ -90,8 +90,8 @@ Some ways to address this would be to either download the album images individua
 ## 📝 More Documentation 📝
 To view more documentation, see [`Documentation`](Documentation/) and [`Planning`](Planning/).
 Additionally, check out our [`BurnDownChart`](BurnDownChart.png) to examine our current pace for completing the software:
+![BurnDownChart](https://github.com/user-attachments/assets/43336817-7d4b-4003-b31f-c5194fdf8405)
 
-![BurnDownChart](https://github.com/user-attachments/assets/9a254e4f-900b-4c73-a101-cb18a3b06ae7)
 
 # Project Setup Guide
 
