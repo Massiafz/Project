@@ -231,9 +231,16 @@ class AlbumCatalogApp(tk.Tk):
         self.search_results = list(filter(matches_filter, self.albums.copy()))
     
     def show_frame(self, frame_name):
+        """
+        Switches to the specified frame and controls the visibility of UI elements like the filter dropdown.
+        Ensures the album catalog is refreshed when switching to the CatalogFrame.
+        """
         frame = self.frames[frame_name]
         if frame_name == "CatalogFrame":
-            frame.refresh_album_list()
+            self.filter_dropdown.pack(side="right", padx=10)  # Show the filter dropdown
+            frame.refresh_album_list()  # Refresh the album catalog
+        else:
+            self.filter_dropdown.pack_forget()  # Hide the filter dropdown
         frame.tkraise()
 
     def search(self, no_refresh = False):
@@ -385,12 +392,10 @@ class SignupFrame(tk.Frame):
         self.controller.users[username] = {"email": email, "password": password}
         self.controller.save_users()
         messagebox.showinfo("Sign Up", "Account created successfully!")
-        self.controller.show_frame("LoginFrame")
+        self.controller.show_frame("LoginFrame")  # Navigate to the login page
         self.username_entry.delete(0, tk.END)
         self.password_entry.delete(0, tk.END)
         self.confirm_password_entry.delete(0, tk.END)
-        self.controller.filter_dropdown.pack(side="right", padx=10)  # Show the filter dropdown
-        self.controller.frames["CatalogFrame"].refresh_button.grid()  # Show the refresh button.
 
 
 # ---------------------------------------------------------------------------
