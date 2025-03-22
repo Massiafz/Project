@@ -105,7 +105,7 @@ class AlbumCatalogApp(tk.Tk):
             state="readonly",
             width=15
         )
-        self.filter_dropdown.pack(side="right", padx=10)
+        self.filter_dropdown.pack_forget()  # Initially hide the dropdown menu
 
         # -----------------------------------------------------------------------
         # Set up ttk styling for a modern look.
@@ -301,6 +301,7 @@ class LoginFrame(tk.Frame):
             self.password_entry.delete(0, tk.END)
             self.controller.search_button.pack(side="right", padx=10)
             self.controller.search_bar.pack(side="right")
+            self.controller.filter_dropdown.pack(side="right", padx=10)  # Show the filter dropdown
             self.controller.frames["CatalogFrame"].refresh_button.grid()  # Show the refresh button.
         else:
             messagebox.showerror("Error", "Invalid username or password.")
@@ -314,6 +315,7 @@ class LoginFrame(tk.Frame):
         messagebox.showinfo("Guest Login", "Continuing as guest.")
         self.controller.search_button.pack(side="right", padx=10)
         self.controller.search_bar.pack(side="right")
+        self.controller.filter_dropdown.pack(side="right", padx=10)  # Show the filter dropdown
         self.controller.frames["CatalogFrame"].refresh_button.grid()  # Show the refresh button.
         self.controller.show_frame("CatalogFrame")
 
@@ -387,6 +389,7 @@ class SignupFrame(tk.Frame):
         self.username_entry.delete(0, tk.END)
         self.password_entry.delete(0, tk.END)
         self.confirm_password_entry.delete(0, tk.END)
+        self.controller.filter_dropdown.pack(side="right", padx=10)  # Show the filter dropdown
         self.controller.frames["CatalogFrame"].refresh_button.grid()  # Show the refresh button.
 
 
@@ -815,6 +818,7 @@ class CatalogFrame(tk.Frame):
         messagebox.showinfo("Logout", "You have been logged out.")
         self.controller.search_button.pack_forget()
         self.controller.search_bar.pack_forget()
+        self.controller.filter_dropdown.pack_forget()  # Hide the filter dropdown on logout
         self.refresh_button.grid_remove()  # Hide the refresh button on logout.
         self.controller.show_frame("LoginFrame")
 
