@@ -91,6 +91,22 @@ class AlbumCatalogApp(tk.Tk):
         )
         self.search_bar.pack_forget()
         
+        # Remove the "Refresh" button from the navigation bar.
+        # self.refresh_button = tk.Button(nav_bar, text="Refresh", command=self.refresh_catalog)
+        # self.refresh_button.pack(side="left", padx=10)
+        # self.refresh_button.pack_forget()
+
+        # Add a dropdown menu for search filters
+        self.search_filter = tk.StringVar(value="All")
+        self.filter_dropdown = ttk.Combobox(
+            nav_bar, 
+            textvariable=self.search_filter, 
+            values=["All", "Album Name", "Artist Name", "Genres", "Release Date"],
+            state="readonly",
+            width=15
+        )
+        self.filter_dropdown.pack(side="right", padx=10)
+
         # -----------------------------------------------------------------------
         # Set up ttk styling for a modern look.
         # -----------------------------------------------------------------------
@@ -185,15 +201,34 @@ class AlbumCatalogApp(tk.Tk):
         return albums
     
     def load_search_query(self, search_query):
+        """
+        Filters albums based on the search query and selected filter.
+        """
         self.search_results = []
-        
-        self.search_results = list(filter(
-            lambda album: search_query == None or 
-                            search_query.lower().strip() in album.get("Album").lower() or
-                            search_query.lower().strip() in album.get("Artist Name").lower() or
-                            search_query.lower().strip() in album.get("Release Date").split("-"),
-            self.albums.copy()
-        ))
+        search_query = search_query.lower().strip() if search_query else None
+        selected_filter = self.search_filter.get()
+
+        def matches_filter(album):
+            if search_query is None:
+                return True
+            if selected_filter == "All":
+                return (
+                    search_query in album.get("Album", "").lower() or
+                    search_query in album.get("Artist Name", "").lower() or
+                    search_query in album.get("Genres", "").lower() or
+                    search_query in album.get("Release Date", "").split("-")
+                )
+            if selected_filter == "Album Name":
+                return search_query in album.get("Album", "").lower()
+            if selected_filter == "Artist Name":
+                return search_query in album.get("Artist Name", "").lower()
+            if selected_filter == "Genres":
+                return search_query in album.get("Genres", "").lower()
+            if selected_filter == "Release Date":
+                return search_query in album.get("Release Date", "").split("-")
+            return False
+
+        self.search_results = list(filter(matches_filter, self.albums.copy()))
     
     def show_frame(self, frame_name):
         frame = self.frames[frame_name]
@@ -210,6 +245,13 @@ class AlbumCatalogApp(tk.Tk):
             frame.refresh_album_list()
         
         frame.tkraise()
+
+    def refresh_catalog(self):
+        """
+        Resets the album catalog view to its original state by reusing the search method with an empty query.
+        """
+        self.search_bar.delete("1.0", tk.END)  # Clear the search bar.
+        self.search("")  # Perform a search with an empty query to reset the catalog.
 
 # ---------------------------------------------------------------------------
 # LoginFrame: The login page that allows users to sign in or continue as a guest.
@@ -259,6 +301,7 @@ class LoginFrame(tk.Frame):
             self.password_entry.delete(0, tk.END)
             self.controller.search_button.pack(side="right", padx=10)
             self.controller.search_bar.pack(side="right")
+            self.controller.frames["CatalogFrame"].refresh_button.grid()  # Show the refresh button.
         else:
             messagebox.showerror("Error", "Invalid username or password.")
     
@@ -271,6 +314,7 @@ class LoginFrame(tk.Frame):
         messagebox.showinfo("Guest Login", "Continuing as guest.")
         self.controller.search_button.pack(side="right", padx=10)
         self.controller.search_bar.pack(side="right")
+        self.controller.frames["CatalogFrame"].refresh_button.grid()  # Show the refresh button.
         self.controller.show_frame("CatalogFrame")
 
 
@@ -343,6 +387,7 @@ class SignupFrame(tk.Frame):
         self.username_entry.delete(0, tk.END)
         self.password_entry.delete(0, tk.END)
         self.confirm_password_entry.delete(0, tk.END)
+        self.controller.frames["CatalogFrame"].refresh_button.grid()  # Show the refresh button.
 
 
 # ---------------------------------------------------------------------------
@@ -383,7 +428,7 @@ class CatalogFrame(tk.Frame):
         self.album_items = []
         self.album_cover_images = []
         
-        # Create a frame for action buttons (Add, Edit, Delete, Edit Account, Logout).
+        # Create a frame for action buttons (Add, Edit, Delete, Edit Account, Logout, Refresh).
         buttonFrame = tk.Frame(self, bg=PRIMARY_BACKGROUND_COLOUR)
         buttonFrame.grid(row=2, column=0, columnspan=2, sticky="nsew")
         buttonFrame.anchor("center")
@@ -402,6 +447,11 @@ class CatalogFrame(tk.Frame):
         
         logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
         logout_btn.grid(row=0, column=4, padx=5, pady=10)
+
+        # Add the "Refresh" button to the bottom right.
+        self.refresh_button = ttk.Button(buttonFrame, text="Refresh", command=controller.refresh_catalog)
+        self.refresh_button.grid(row=0, column=5, padx=5, pady=10)
+        self.refresh_button.grid_remove()  # Initially hide the button.
     
     def thread_function_refresh_albums(self, index, album, currentRow):
         albumName = album.get("Album")
@@ -765,6 +815,7 @@ class CatalogFrame(tk.Frame):
         messagebox.showinfo("Logout", "You have been logged out.")
         self.controller.search_button.pack_forget()
         self.controller.search_bar.pack_forget()
+        self.refresh_button.grid_remove()  # Hide the refresh button on logout.
         self.controller.show_frame("LoginFrame")
 
 # ---------------------------------------------------------------------------
