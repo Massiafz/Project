@@ -17,8 +17,8 @@ import threading
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
 # ---------------------------------------------------------------------------
-USERS_JSON = "Code/users.json"               # JSON file that stores user login information.
-ALBUMS_CSV = "Code/cleaned_music_data.csv"       # CSV file containing album catalog data.
+USERS_JSON = "users.json"               # JSON file that stores user login information.
+ALBUMS_CSV = "cleaned_music_data.csv"       # CSV file containing album catalog data.
 
 # Define colour constants for UI consistency
 PRIMARY_BACKGROUND_COLOUR = "#527cc5"       # Primary background colour for the app.
@@ -47,7 +47,7 @@ class AlbumCatalogApp(tk.Tk):
         # Load and set the window icon/logo.
         # Open the logo image, crop it to the desired area, resize it, and then set it as the window icon.
         # -----------------------------------------------------------------------
-        image = Image.open("Code/BrightByteLogo.png")
+        image = Image.open("BrightByteLogo.png")
         image = image.crop((0, 1080 * 0.25, 1080, 1080 * 0.75))
         image = image.resize((125, 75), Image.LANCZOS)
         self.image = ImageTk.PhotoImage(image)
@@ -396,7 +396,7 @@ class CatalogFrame(tk.Frame):
         albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
         albumItem.grid_propagate(False)
         
-        albumCover = Image.open("Code/Eric.png")
+        albumCover = Image.open("Eric.png")
         albumURL = album.get("Cover URL")
 
         url_pattern = re.compile(
