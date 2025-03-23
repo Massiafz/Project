@@ -9,5 +9,25 @@
     "bach": {
         "email": "bbb@gmail.cc",
         "password": "111"
+    },
+    "moksh": {
+        "email": "moksh@goat.com",
+        "password": "zzz"
+    },
+    "phase3": {
+        "email": "phase3@gmail.com",
+        "password": "phase"
+    },
+    "cody": {
+        "email": "moksh@moksh.com",
+        "password": "moksh"
+    },
+    "men": {
+        "email": "men@gmail.com",
+        "password": "men"
+    },
+    "guy": {
+        "email": "guy@gmail.com",
+        "password": "guy"
     }
 }

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 import tkinter as tk
 from tkinter import messagebox
-from main import LoginFrame, SignupFrame
+from main import LoginFrame, SignupFrame, AlbumCatalogApp
 
 
 # Dummy controller to simulate the minimal attributes and methods required by the frames.
@@ -229,6 +229,25 @@ class TestSignupFrame(unittest.TestCase):
         self.signup_frame.confirm_password_entry.insert(0, "")
         self.signup_frame.signup()
         mock_showerror.assert_called_with("Error", "Username and password cannot be empty.")
+
+class TestAlbumFiltering(unittest.TestCase):
+
+    def setUp(self):
+        """Set up a test dataset."""
+        self.test_albums = [
+            {"Album": "Test Album 1", "Artist Name": "Artist A", "Genres": "Rock", "Average Rating": "4.5", "Release Date": "2005"},
+            {"Album": "Test Album 2", "Artist Name": "Artist B", "Genres": "Pop", "Average Rating": "3.8", "Release Date": "2010"},
+        ]
+
+    def test_filter_by_genre(self):
+        app = AlbumCatalogApp()
+        result = app.load_albums_from_csv(None, genre="Rock")
+        self.assertEqual(len(result), 1)
+
+    def test_filter_by_rating_range(self):
+        app = AlbumCatalogApp()
+        result = app.load_albums_from_csv(None, min_rating=4.0, max_rating=5.0)
+        self.assertEqual(len(result), 1)
 
 if __name__ == "__main__":
     unittest.main()

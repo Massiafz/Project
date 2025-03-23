@@ -81,7 +81,14 @@ A challenge we are facing is figuring out how to prepare and add the album image
 Some ways to address this would be to either download the album images individually or to use an API for efficiency.
 
 ### Iteration 2
-> *(Not yet started)* -> Plans include: CRUD operations on albums, searching, filtering, album images
+- Worked on the following tasks...
+- Adding Images for album covers
+- Final changed to CSV (after editing, adding, or deleting)
+- Searching for songs
+- Guest Account
+- Database/Build
+- Multi-threading
+- UI Updates
 
 ### Iteration 3
 > *(Not yet started)* -> Plans include: Personalized recommendations, song sample playback
@@ -90,6 +97,55 @@ Some ways to address this would be to either download the album images individua
 ## 📝 More Documentation 📝
 To view more documentation, see [`Documentation`](Documentation/) and [`Planning`](Planning/).
 Additionally, check out our [`BurnDownChart`](BurnDownChart.png) to examine our current pace for completing the software:
+![BurnDownChart](https://github.com/user-attachments/assets/43336817-7d4b-4003-b31f-c5194fdf8405)
 
-![BurnDownChart](https://github.com/user-attachments/assets/9a254e4f-900b-4c73-a101-cb18a3b06ae7)
+
+# Project Setup Guide
+
+## Overview
+This project automates data processing and analysis using Python. The provided `Makefile` simplifies installation, execution, and cleanup.
+
+## Prerequisites
+- Python 3 installed
+- `pip` installed
+- Required Python packages (listed in `requirements.txt`)
+
+## Installation & Setup
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/Massiafz/Project.git
+   cd Project
+   ```
+2. Install dependencies:
+   ```sh
+   make install
+   ```
+
+## Running the Project
+1. Process the data:
+   ```sh
+   make process
+   ```
+2. Run the main script for analysis/plotting:
+   ```sh
+   make plot
+   ```
+
+## Running Tests
+(Currently, no test target is defined in the Makefile. If tests exist, a `make test` command should be added.)
+
+## Cleaning Up
+To remove temporary files:
+```sh
+make clean
+```
+You will be prompted for confirmation before deletion.
+
+## Additional Notes
+- Ensure all required data files (e.g., `data.csv`) are available in the correct directories before running.
+- If running on Windows, you may need to use `python` instead of `python3` and `pip` instead of `pip3`.
+
+For deployment instructions, additional setup may be required.
+
+
 
