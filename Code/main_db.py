@@ -13,12 +13,12 @@ import re                                 # For regular expression operations.
 from urllib.request import urlopen, Request # For making HTTP requests.
 import io                                 # For I/O operations.
 import threading
-
+import sqlite3
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
 # ---------------------------------------------------------------------------
 USERS_JSON = "users.json"               # JSON file that stores user login information.
-ALBUMS_CSV = "cleaned_music_data.csv"       # CSV file containing album catalog data.
+DB_FILE = "music.db"                    # SQLite database file for album data.
 
 # Define colour constants for UI consistency
 PRIMARY_BACKGROUND_COLOUR = "#527cc5"       # Primary background colour for the app.
@@ -119,7 +119,7 @@ class AlbumCatalogApp(tk.Tk):
         self.users = self.load_users()
         self.current_user = None
         self.search_results = None
-        self.albums = self.load_albums_from_csv()
+        self.albums = self.load_albums_from_db()
         
         # -----------------------------------------------------------------------
         # Create container for pages.
@@ -156,68 +156,146 @@ class AlbumCatalogApp(tk.Tk):
         with open(USERS_JSON, "w") as f:
             json.dump(self.users, f, indent=4)
     
-    def save_albums(self):
-        with open(ALBUMS_CSV, "w", newline="", encoding="utf-8") as csvfile:
-            writer = csv.DictWriter(csvfile, ["Ranking","Album","Artist Name","Release Date","Genres","Average Rating","Number of Ratings","Number of Reviews","Cover URL"])
-            writer.writeheader()
-            for album in self.albums:
-                writer.writerow({
-                    "Ranking": album["Ranking"],
-                    "Album": album["Album"],
-                    "Artist Name": album["Artist Name"],
-                    "Release Date": album["Release Date"],
-                    "Genres": album["Genres"],
-                    "Average Rating": album["Average Rating"],
-                    "Number of Ratings": album["Number of Ratings"],
-                    "Number of Reviews": album["Number of Reviews"],
-                    "Cover URL": album["Cover URL"]
-                })
-    
-    def load_albums_from_csv(self):
+    def load_albums_from_db(self):
+        """Load albums from SQLite database."""
         albums = []
-        if os.path.exists(ALBUMS_CSV):
-            with open(ALBUMS_CSV, newline="", encoding="utf-8") as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    album = {
-                        "Ranking": row.get("Ranking", "").strip(),
-                        "Album": row.get("Album", "").strip(),
-                        "Artist Name": row.get("Artist Name", "").strip(),
-                        "Release Date": row.get("Release Date", "").strip(),
-                        "Genres": row.get("Genres", "").strip(),
-                        "Average Rating": row.get("Average Rating", "").strip(),
-                        "Number of Ratings": row.get("Number of Ratings", "").strip(),
-                        "Number of Reviews": row.get("Number of Reviews", "").strip(),
-                        "Cover URL": row.get("Cover URL", "").strip()
-                    }
-                    albums.append(album)
-        else:
-            print("The file does not exist.")
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT ranking, album, artist_name, release_date, genres,
+                       average_rating, num_ratings, num_reviews, cover_url
+                FROM albums
+            """)
+            rows = cursor.fetchall()
+            
+            for row in rows:
+                album = {
+                    "Ranking": str(row[0]),
+                    "Album": row[1],
+                    "Artist Name": row[2],
+                    "Release Date": row[3],
+                    "Genres": row[4],
+                    "Average Rating": str(row[5]),
+                    "Number of Ratings": str(row[6]),
+                    "Number of Reviews": str(row[7]),
+                    "Cover URL": row[8]
+                }
+                albums.append(album)
+                
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+        finally:
+            if conn:
+                conn.close()
         return albums
+    
+    def save_albums(self):
+        """Save albums to SQLite database."""
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+            
+            # Clear existing data
+            cursor.execute("DELETE FROM albums")
+            
+            # Insert new data
+            for album in self.albums:
+                cursor.execute("""
+                    INSERT INTO albums (
+                        ranking, album, artist_name, release_date, genres,
+                        average_rating, num_ratings, num_reviews, cover_url
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    int(album["Ranking"]),
+                    album["Album"],
+                    album["Artist Name"],
+                    album["Release Date"],
+                    album["Genres"],
+                    float(album["Average Rating"]),
+                    int(album["Number of Ratings"]),
+                    int(album["Number of Reviews"]),
+                    album["Cover URL"]
+                ))
+            
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            conn.rollback()
+        finally:
+            if conn:
+                conn.close()
     
     def load_search_query(self, search_query):
         """
-        Filters albums based on the search query and selected filter.
+        Filters albums based on the search query and selected filter using SQL.
         """
-        self.search_results = []
-        search_query = search_query.lower().strip() if search_query else None
-        selected_filter = self.search_filter.get()
-        
-        def matches_filter(album):
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+            
+            search_query = search_query.lower().strip() if search_query else None
+            selected_filter = self.search_filter.get()
+            
             if search_query is None:
-                return True
-            if selected_filter == "Album Name":
-                return search_query in album.get("Album", "").lower()
-            if selected_filter == "Artist Name":
-                return search_query in album.get("Artist Name", "").lower()
-            if selected_filter == "Genres":
-                return search_query in album.get("Genres", "").lower()
-            if selected_filter == "Release Date":
-                # Check if search query is present in any part of the release date split by "-"
-                return search_query in album.get("Release Date", "").split("-")
-            return False
-        
-        self.search_results = list(filter(matches_filter, self.albums.copy()))
+                cursor.execute("""
+                    SELECT ranking, album, artist_name, release_date, genres,
+                           average_rating, num_ratings, num_reviews, cover_url
+                    FROM albums
+                """)
+            else:
+                if selected_filter == "Album Name":
+                    cursor.execute("""
+                        SELECT ranking, album, artist_name, release_date, genres,
+                               average_rating, num_ratings, num_reviews, cover_url
+                        FROM albums
+                        WHERE LOWER(album) LIKE ?
+                    """, (f"%{search_query}%",))
+                elif selected_filter == "Artist Name":
+                    cursor.execute("""
+                        SELECT ranking, album, artist_name, release_date, genres,
+                               average_rating, num_ratings, num_reviews, cover_url
+                        FROM albums
+                        WHERE LOWER(artist_name) LIKE ?
+                    """, (f"%{search_query}%",))
+                elif selected_filter == "Genres":
+                    cursor.execute("""
+                        SELECT ranking, album, artist_name, release_date, genres,
+                               average_rating, num_ratings, num_reviews, cover_url
+                        FROM albums
+                        WHERE LOWER(genres) LIKE ?
+                    """, (f"%{search_query}%",))
+                elif selected_filter == "Release Date":
+                    cursor.execute("""
+                        SELECT ranking, album, artist_name, release_date, genres,
+                               average_rating, num_ratings, num_reviews, cover_url
+                        FROM albums
+                        WHERE release_date LIKE ?
+                    """, (f"%{search_query}%",))
+            
+            rows = cursor.fetchall()
+            self.search_results = []
+            
+            for row in rows:
+                album = {
+                    "Ranking": str(row[0]),
+                    "Album": row[1],
+                    "Artist Name": row[2],
+                    "Release Date": row[3],
+                    "Genres": row[4],
+                    "Average Rating": str(row[5]),
+                    "Number of Ratings": str(row[6]),
+                    "Number of Reviews": str(row[7]),
+                    "Cover URL": row[8]
+                }
+                self.search_results.append(album)
+                
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            self.search_results = []
+        finally:
+            if conn:
+                conn.close()
     
     def show_frame(self, frame_name):
         frame = self.frames[frame_name]
@@ -570,21 +648,45 @@ class CatalogFrame(tk.Frame):
             if not artist or not album_name or not release_date:
                 messagebox.showerror("Error", "Artist Name, Album, and Release Date are required.")
                 return
-            new_album = {
-                "Ranking": 0,
-                "Artist Name": artist,
-                "Album": album_name,
-                "Release Date": release_date,
-                "Genres": genres,
-                "Average Rating": 0,
-                "Number of Ratings": 0,
-                "Number of Reviews": 0,
-                "Cover URL": cover_url
-            }
-            self.controller.albums.append(new_album)
-            self.controller.save_albums()
-            self.refresh_album_list()
-            add_win.destroy()
+                
+            try:
+                conn = sqlite3.connect(DB_FILE)
+                cursor = conn.cursor()
+                
+                # Get the next ranking number
+                cursor.execute("SELECT MAX(ranking) FROM albums")
+                max_ranking = cursor.fetchone()[0]
+                next_ranking = 1 if max_ranking is None else max_ranking + 1
+                
+                # Insert new album
+                cursor.execute("""
+                    INSERT INTO albums (
+                        ranking, album, artist_name, release_date, genres,
+                        average_rating, num_ratings, num_reviews, cover_url
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    next_ranking,
+                    album_name,
+                    artist,
+                    release_date,
+                    genres,
+                    0.0,  # average_rating
+                    0,    # num_ratings
+                    0,    # num_reviews
+                    cover_url
+                ))
+                
+                conn.commit()
+                self.controller.albums = self.controller.load_albums_from_db()
+                self.refresh_album_list()
+                add_win.destroy()
+                
+            except sqlite3.Error as e:
+                messagebox.showerror("Database Error", f"Error adding album: {str(e)}")
+                conn.rollback()
+            finally:
+                if conn:
+                    conn.close()
         
         ttk.Button(add_win, text="Save Album", command=save_album).grid(row=5, column=0, columnspan=2, pady=10)
     
@@ -592,6 +694,7 @@ class CatalogFrame(tk.Frame):
         if not self.selected_album:
             messagebox.showerror("Error", "Please select an album to edit.")
             return
+            
         index = self.album_items.index(self.selected_album)
         album = self.controller.albums[index]
         
@@ -649,38 +752,77 @@ class CatalogFrame(tk.Frame):
             updated_release = release_entry.get().strip()
             updated_genres = genres_entry.get().strip()
             cover_url = album_url_entry.get().strip()
+            
             if self.current_file_path != "":
                 cover_url = self.current_file_path
+                
             if not updated_artist or not updated_album or not updated_release:
                 messagebox.showerror("Error", "Artist Name, Album, and Release Date are required.")
                 return
-            self.controller.albums[index] = {
-                "Ranking": album["Ranking"],
-                "Artist Name": updated_artist,
-                "Album": updated_album,
-                "Release Date": updated_release,
-                "Genres": updated_genres,
-                "Average Rating": album["Average Rating"],
-                "Number of Ratings": album["Number of Ratings"],
-                "Number of Reviews": album["Number of Reviews"],
-                "Cover URL": cover_url
-            }
-            self.controller.save_albums()
-            self.refresh_album_list()
-            edit_win.destroy()
-        
+
+            try:
+                conn = sqlite3.connect(DB_FILE)
+                cursor = conn.cursor()
+
+                # Update database record
+                cursor.execute("""
+                    UPDATE albums SET
+                        artist_name = ?,
+                        album = ?,
+                        release_date = ?,
+                        genres = ?,
+                        cover_url = ?
+                    WHERE ranking = ?
+                """, (
+                    updated_artist,
+                    updated_album,
+                    updated_release,
+                    updated_genres,
+                    cover_url,
+                    int(album["Ranking"])
+                ))
+
+                conn.commit()
+                self.controller.albums = self.controller.load_albums_from_db()
+                self.refresh_album_list()
+                edit_win.destroy()
+
+            except sqlite3.Error as e:
+                messagebox.showerror("Database Error", f"Error updating album: {str(e)}")
+                conn.rollback()
+            finally:
+                if conn:
+                    conn.close()
+
         ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=5, column=0, columnspan=2, pady=10)
     
     def delete_album(self):
         if not self.selected_album:
             messagebox.showerror("Error", "Please select an album to delete.")
             return
+            
         index = self.album_items.index(self.selected_album)
+        album = self.controller.albums[index]
+        
         confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete the selected album?")
         if confirm:
-            del self.controller.albums[index]
-            self.controller.save_albums()
-            self.refresh_album_list()
+            try:
+                conn = sqlite3.connect(DB_FILE)
+                cursor = conn.cursor()
+                
+                # Delete the album from the database
+                cursor.execute("DELETE FROM albums WHERE ranking = ?", (int(album["Ranking"]),))
+                
+                conn.commit()
+                self.controller.albums = self.controller.load_albums_from_db()
+                self.refresh_album_list()
+                
+            except sqlite3.Error as e:
+                messagebox.showerror("Database Error", f"Error deleting album: {str(e)}")
+                conn.rollback()
+            finally:
+                if conn:
+                    conn.close()
     
     def edit_account(self):
         current_user = self.controller.current_user
