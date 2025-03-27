@@ -703,9 +703,6 @@ Once you’ve added albums, you can view the entire catalog in a table or grid l
 
 ## ⚙️ 3. Settings & Configuration
 
-### 🎨 Customizing the Interface
-Users can customize the application’s layout, theme, or language by navigating to the settings section. There, they can choose display preferences such as switching between light and dark modes.
-
 ### 💾 Data Backup & Import/Export
 To ensure data is safely stored, users can export their catalog to a CSV file. This allows you to back up the data or share it with others.
 
@@ -803,10 +800,6 @@ This launches the BrightByte Music Cataloging Software and opens the main window
   2. Click "Import Data."
   3. Upload a properly formatted CSV file.
 
-### 3.6 Customizing the Application
-- **Change Theme:** Navigate to "Settings > Appearance" to switch between light and dark themes.
-- **Language Settings:** Change the application language in "Settings."
-
 ## 4. Troubleshooting
 - **Application Doesn’t Open:** Ensure dependencies are installed and Python is correctly set up.
 - **Search Results Are Empty:** Check the query and filters. Ensure the album exists in the catalog.
@@ -850,8 +843,6 @@ Solution: Go to the Catalog page and click the Add Album button. Fill out the fo
 ### 5. How do I edit or delete an album from the catalog?
 Solution: On the Catalog page, find the album you want to modify. Click the Edit button to update the album’s information or click Delete to remove it from the catalog. A confirmation will appear before deletion.
 
-### 6. How can I change the application theme?
-Solution: Go to the Settings menu, click on Appearance, and select your preferred theme (Light/Dark).
 
 ### 7. My CSV file import didn’t work. What should I check?
 Solution: Ensure the CSV file is formatted correctly, with the necessary columns like Album Name, Artist Name, Release Date, etc. If the file structure doesn’t match the application’s expectations, the import may fail.
