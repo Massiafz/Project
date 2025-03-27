@@ -417,3 +417,111 @@ class AlbumCatalog:
         """
         pass  # Function implementation here
 ```
+
+## System Architecture
+![Screenshot 2025-03-13 112310](https://github.com/user-attachments/assets/1f9ce149-e0f3-41f3-b905-da9d08cb6c67)
+![Screenshot 2025-03-04 213451](https://github.com/user-attachments/assets/dcf2bc50-284f-4300-8599-4d676abfbd3d)
+![Screenshot 2025-03-01 180753](https://github.com/user-attachments/assets/fafed00a-bc28-443d-a95d-b1b30a71743a)
+
+## 📌 Setup Guide: How to Install, Configure, and Run the Software
+
+📖 Overview
+The BrightByte Music Cataloging Software is a Python-based application that allows users to manage and browse a catalog of music albums. This guide will walk you through the steps to install, configure, and run the software on your system.
+🔧 Prerequisites
+Before installing and running the program, ensure that you have the following:
+Python 3 installed on your system. You can check by running:
+
+ sh
+CopyEdit
+python --version
+ If Python is not installed, download it from python.org.
+
+
+pip (Python Package Manager) installed. Check with:
+
+ sh
+CopyEdit
+pip --version
+
+
+Git installed. Verify with:
+
+ sh
+CopyEdit
+git --version
+ If not installed, download Git from git-scm.com.
+
+
+📥 Installation & Setup
+1️⃣ Clone the Repository
+Open a terminal (or Command Prompt) and run the following command to clone the project:
+sh
+CopyEdit
+git clone https://github.com/Massiafz/Project.git
+cd Project
+
+2️⃣ Install Dependencies
+The project requires certain Python libraries to function correctly. Install them using:
+sh
+CopyEdit
+pip install -r requirements.txt
+
+Alternatively, if a Makefile is provided, you can install dependencies with:
+sh
+CopyEdit
+make install
+
+💡 Note: If you're on Windows and don't have make, manually install dependencies using pip install -r requirements.txt.
+
+🚀 Running the Software
+1️⃣ Run the Program
+Navigate to the directory where main.py is located:
+sh
+CopyEdit
+cd Code
+
+Run the application using:
+sh
+CopyEdit
+python main.py
+
+or, if using Python 3 explicitly:
+sh
+CopyEdit
+python3 main.py
+
+2️⃣ Running Data Processing & Analysis (If applicable)
+If your project involves data processing, you can use the provided Makefile to automate tasks:
+sh
+CopyEdit
+make process
+make plot
+
+💡 Note: Windows users may need to replace make commands with direct Python script execution.
+
+✅ Running Tests (If applicable)
+If tests exist, you can run them with:
+sh
+CopyEdit
+make test
+
+(Currently, no test target is defined in the Makefile. If needed, a make test command should be added.)
+
+🧹 Cleaning Up
+To remove temporary files and cached data:
+sh
+CopyEdit
+make clean
+
+💡 You may be prompted for confirmation before deletion.
+
+📌 Additional Notes
+Ensure all required data files (e.g., data.csv) are present in the correct directories before running the application.
+
+
+If running on Windows, you may need to use python instead of python3, and pip instead of pip3.
+
+
+For deployment instructions, additional setup may be required.
+
+
