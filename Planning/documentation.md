@@ -1,12 +1,12 @@
 # Documentation Plan
 
-### Developer Documentation:
+## Developer Documentation:
 Moksh, Massi, and Vincent will be responsible for writing and maintaining the developer documentation, including code documentation, system architecture, and setup guides.
 
-### User / In-Application Documentation:
+## User / In-Application Documentation:
 Massi, Bach, and Jason will also create the user manual, FAQs, and tooltips, ensuring the customer has clear guidance on using the album cataloging system.
 
-## Code Documentation: 
+# Code Documentation: 
 
 ```
 class AlbumCatalogApp(tk.Tk):
@@ -418,110 +418,109 @@ class AlbumCatalog:
         pass  # Function implementation here
 ```
 
-## System Architecture
+# System Architecture
 ![Screenshot 2025-03-13 112310](https://github.com/user-attachments/assets/1f9ce149-e0f3-41f3-b905-da9d08cb6c67)
 ![Screenshot 2025-03-04 213451](https://github.com/user-attachments/assets/dcf2bc50-284f-4300-8599-4d676abfbd3d)
 ![Screenshot 2025-03-01 180753](https://github.com/user-attachments/assets/fafed00a-bc28-443d-a95d-b1b30a71743a)
 
-## 📌 Setup Guide: How to Install, Configure, and Run the Software
+# 📌 Setup Guide: Install, Configure, and Run BrightByte Music Cataloging Software
 
-📖 Overview
-The BrightByte Music Cataloging Software is a Python-based application that allows users to manage and browse a catalog of music albums. This guide will walk you through the steps to install, configure, and run the software on your system.
-🔧 Prerequisites
-Before installing and running the program, ensure that you have the following:
-Python 3 installed on your system. You can check by running:
+## 📖 Overview
+BrightByte Music Cataloging Software is a Python-based application that helps users manage and browse a catalog of music albums. This guide provides step-by-step instructions to install, configure, and run the software.
 
- sh
-CopyEdit
+---
+## 🔧 Prerequisites
+Before proceeding, ensure the following dependencies are installed:
+
+### ✅ Python 3
+Check if Python is installed by running:
+```sh
 python --version
- If Python is not installed, download it from python.org.
+```
+If not installed, download it from [python.org](https://www.python.org/downloads/).
 
-
-pip (Python Package Manager) installed. Check with:
-
- sh
-CopyEdit
+### ✅ pip (Python Package Manager)
+Verify pip installation with:
+```sh
 pip --version
+```
 
-
-Git installed. Verify with:
-
- sh
-CopyEdit
+### ✅ Git
+Ensure Git is installed by running:
+```sh
 git --version
- If not installed, download Git from git-scm.com.
+```
+If not installed, download Git from [git-scm.com](https://git-scm.com/downloads).
 
+---
+## 📥 Installation & Setup
 
-📥 Installation & Setup
-1️⃣ Clone the Repository
-Open a terminal (or Command Prompt) and run the following command to clone the project:
-sh
-CopyEdit
+### 1️⃣ Clone the Repository
+Open a terminal and run:
+```sh
 git clone https://github.com/Massiafz/Project.git
 cd Project
+```
 
-2️⃣ Install Dependencies
-The project requires certain Python libraries to function correctly. Install them using:
-sh
-CopyEdit
+### 2️⃣ Install Dependencies
+Install required Python libraries with:
+```sh
 pip install -r requirements.txt
-
-Alternatively, if a Makefile is provided, you can install dependencies with:
-sh
-CopyEdit
+```
+Alternatively, if a `Makefile` is provided, install dependencies using:
+```sh
 make install
+```
+> 💡 **Note:** Windows users without `make` should use `pip install -r requirements.txt`.
 
-💡 Note: If you're on Windows and don't have make, manually install dependencies using pip install -r requirements.txt.
+---
+## 🚀 Running the Software
 
-🚀 Running the Software
-1️⃣ Run the Program
-Navigate to the directory where main.py is located:
-sh
-CopyEdit
+### 1️⃣ Run the Program
+Navigate to the directory containing `main.py`:
+```sh
 cd Code
-
-Run the application using:
-sh
-CopyEdit
+```
+Run the application with:
+```sh
 python main.py
-
-or, if using Python 3 explicitly:
-sh
-CopyEdit
+```
+Or explicitly using Python 3:
+```sh
 python3 main.py
+```
 
-2️⃣ Running Data Processing & Analysis (If applicable)
-If your project involves data processing, you can use the provided Makefile to automate tasks:
-sh
-CopyEdit
+### 2️⃣ Running Data Processing & Analysis *(If applicable)*
+If data processing is included, run:
+```sh
 make process
 make plot
+```
+> 💡 **Note:** Windows users may need to replace `make` commands with direct Python script execution.
 
-💡 Note: Windows users may need to replace make commands with direct Python script execution.
-
-✅ Running Tests (If applicable)
-If tests exist, you can run them with:
-sh
-CopyEdit
+---
+## ✅ Running Tests *(If applicable)*
+If tests exist, execute:
+```sh
 make test
+```
+> *(Currently, no `test` target is defined in the `Makefile`. Add it if needed.)*
 
-(Currently, no test target is defined in the Makefile. If needed, a make test command should be added.)
-
-🧹 Cleaning Up
+---
+## 🧹 Cleaning Up
 To remove temporary files and cached data:
-sh
-CopyEdit
+```sh
 make clean
+```
+> 💡 You may be prompted for confirmation before deletion.
 
-💡 You may be prompted for confirmation before deletion.
+---
+## 📌 Additional Notes
+- Ensure all required data files (e.g., `data.csv`) are in the correct directories before running the application.
+- Windows users may need to use `python` instead of `python3`, and `pip` instead of `pip3`.
+- Additional setup may be required for deployment.
 
-📌 Additional Notes
-Ensure all required data files (e.g., data.csv) are present in the correct directories before running the application.
-
-
-If running on Windows, you may need to use python instead of python3, and pip instead of pip3.
-
-
-For deployment instructions, additional setup may be required.
+---
+🎵 **Enjoy using BrightByte Music Cataloging Software!** 🎶
 
 
