@@ -820,6 +820,108 @@ This launches the BrightByte Music Cataloging Software and opens the main window
 Now that you've set up and learned to use BrightByte Music Cataloging Software, you can easily manage your album collection. If you need assistance, refer to the troubleshooting section or contact support.
 
 
+# FAQs (Frequently Asked Questions)
+### 1. The application doesn’t open. What should I do?
+Solution: Ensure that Python 3 and pip are installed correctly. Make sure all dependencies are installed by running:
+
+
+```
+make install
+```
+Check: Verify that you are in the correct directory when running the main.py file. Use:
+Edit
+```
+python main.py
+```
+
+### 2. I'm unable to log in. Why?
+Solution: Double-check your username and password. If you forget your credentials, try using the Sign Up button to create a new account, or continue as a guest if you're not concerned with logging in.
+
+Possible Cause: You may have mistyped your credentials. Ensure that your keyboard's Caps Lock is off.
+
+### 3. The search results are not showing any albums. What should I do?
+Solution: Ensure that your search query is correct, and try adjusting the filter settings (e.g., Album Name, Artist Name, Genres). If no results appear, check if the album is added to the catalog.
+
+Tip: If you’ve just added an album, refresh the catalog to view the new entry.
+
+### 4. How do I add a new album to the catalog?
+Solution: Go to the Catalog page and click the Add Album button. Fill out the form with album details, such as Album Name, Artist Name, and Release Date. Click Save once done.
+
+### 5. How do I edit or delete an album from the catalog?
+Solution: On the Catalog page, find the album you want to modify. Click the Edit button to update the album’s information or click Delete to remove it from the catalog. A confirmation will appear before deletion.
+
+### 6. How can I change the application theme?
+Solution: Go to the Settings menu, click on Appearance, and select your preferred theme (Light/Dark).
+
+### 7. My CSV file import didn’t work. What should I check?
+Solution: Ensure the CSV file is formatted correctly, with the necessary columns like Album Name, Artist Name, Release Date, etc. If the file structure doesn’t match the application’s expectations, the import may fail.
+
+### 8. I get an error when exporting data. What can I do?
+Solution: Check if the file you’re exporting to is open in another application (like Excel). Close the file and try exporting again.
+
+# Tooltips and Inline Help
+## Search Bar
+### Tooltip:
+"Enter the name of the album, artist, or any related keyword to search."
+
+### Inline Help:
+If the search bar is empty:
+"Type something here to search for albums."
+
+When there are no results:
+"No results found. Try a different search term."
+
+## Search Filter Dropdown
+### Tooltip:
+"Select a filter to narrow your search by Album Name, Artist Name, Genres, or Release Date."
+
+### Inline Help:
+When hovering over the filter dropdown:
+"Filter search results by specific criteria."
+
+## Add Album Button
+### Tooltip:
+"Click here to add a new album to your catalog."
+
+### Inline Help:
+"Fill out all fields in the form to add a new album."
+
+## Edit Button (in Catalog)
+### Tooltip:
+"Click here to edit this album’s information."
+
+### Inline Help:
+"Make changes to the album’s details and save."
+
+## Delete Button (in Catalog)
+### Tooltip:
+"Click here to remove this album from your catalog."
+
+Inline Help:
+"Are you sure you want to delete this album? This action cannot be undone."
+
+## Settings Menu
+### Tooltip:
+"Access application settings to change theme, language, or other preferences."
+
+### Inline Help:
+"Modify your preferences, such as theme or appearance settings, from here."
+
+## Export Data Button
+### Tooltip:
+"Click here to export your catalog data as a CSV file."
+
+### Inline Help:
+"Ensure no other program is using the export file before saving."
+
+## Import Data Button
+### Tooltip:
+"Click here to import album data from a CSV file."
+
+### Inline Help:
+"Select a valid CSV file containing album data to import."
+
+
 
 
 
