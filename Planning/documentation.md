@@ -524,3 +524,407 @@ make clean
 🎵 **Enjoy using BrightByte Music Cataloging Software!** 🎶
 
 
+## 🛠️ Troubleshooting & Debugging Guide
+
+### 📖 Overview
+This guide provides solutions to common installation, configuration, and runtime issues encountered while using this software. Follow the steps outlined below to diagnose and resolve problems efficiently.
+
+---
+
+## 🔧 1. Installation Issues
+
+### ❌ Problem: Error Installing Dependencies
+**Solution:**
+1. Verify that Python and pip are correctly installed:
+   ```sh
+   python --version
+   pip --version
+   ```
+2. If these commands fail, install or reinstall Python from the [official Python website](https://www.python.org/).
+3. If errors occur when installing from `requirements.txt`, try upgrading pip:
+   ```sh
+   python -m pip install --upgrade pip
+   ```
+4. Ensure all package names are correctly specified in `requirements.txt`.
+
+### ❌ Problem: Makefile Commands Fail (Linux/macOS)
+**Solution:**
+1. Check if `make` is installed:
+   ```sh
+   make --version
+   ```
+2. If missing, install it using:
+   - **Ubuntu/Debian:**
+     ```sh
+     sudo apt install make
+     ```
+   - **macOS (Homebrew):**
+     ```sh
+     brew install make
+     ```
+
+---
+
+## 🚀 2. Running Issues
+
+### ❌ Problem: Application Does Not Start
+**Solution:**
+1. Ensure you are in the correct project directory:
+   ```sh
+   cd path/to/project/Code
+   ```
+2. Try running the script manually:
+   ```sh
+   python main.py
+   ```
+3. If dependencies are missing, reinstall them:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+### ❌ Problem: Missing Data Files (e.g., `data.csv`)
+**Solution:**
+1. Verify that all required data files exist in the expected directories.
+2. If missing, obtain the necessary files from the project owner or use sample data if available.
+
+---
+
+## ⚙️ 3. Configuration Issues
+
+### ❌ Problem: Configuration Settings Not Applying
+**Solution:**
+1. Ensure configuration files (e.g., JSON, CSV) are in the correct directory.
+2. Check if they contain valid and properly formatted data.
+3. If using environment variables, verify that API keys or database credentials are correctly specified.
+
+---
+
+## 🐞 4. Debugging Tips
+
+### ❌ Problem: Unexpected Behavior or Crashes
+**Solution:**
+1. **Check Error Logs:** Review output logs for error messages.
+2. **Enable Debug Mode:**
+   ```python
+   import logging
+   logging.basicConfig(level=logging.DEBUG)
+   ```
+3. **Reproduce the Error:** Identify the exact steps leading to the issue.
+4. **Use a Debugger:**
+   ```python
+   import pdb; pdb.set_trace()
+   ```
+
+---
+
+## 🔍 5. Common Errors and Solutions
+
+### ❌ Error: `ModuleNotFoundError`
+**Solution:**
+1. Ensure all dependencies are installed:
+   ```sh
+   pip install -r requirements.txt
+   ```
+2. Reinstall a specific missing package:
+   ```sh
+   pip install <module_name>
+   ```
+
+### ❌ Error: Permission Denied (on Files or Directories)
+**Solution:**
+1. Ensure the user has the necessary permissions:
+   ```sh
+   chmod 777 <file_or_directory>
+   ```
+2. Run the command with administrator privileges:
+   - **Windows:** Open Command Prompt as Administrator.
+   - **Linux/macOS:** Prefix commands with `sudo`:
+     ```sh
+     sudo python main.py
+     ```
+
+---
+
+## 📞 6. Contact and Support
+If you continue to face issues, provide the following details when seeking support:
+- **Error messages or logs**
+- **Your operating system and Python version**
+- **Steps to reproduce the issue**
+
+This guide should help resolve most common issues efficiently. 🚀
+
+## 📝 User / In-Application Documentation
+
+### 📖 Overview
+This section provides the necessary information for users to effectively interact with the software. It includes an overview of the application’s key features, how to use them, and what to expect at different stages of interaction.
+
+---
+
+## 🚀 1. Getting Started
+
+### 🎵 Launching the Application
+Once the software is installed and configured, launch the application by running the `main.py` file. This will open the program’s user interface (UI), where you can start interacting with the cataloging system.
+
+```sh
+python main.py
+```
+
+### 📂 First-Time Setup
+If this is your first time using the software, you may be prompted to upload your music data (e.g., album names, artist details). Ensure your files are in the correct format (CSV or another supported format) and follow the on-screen instructions for the initial setup.
+
+---
+
+## 🔑 2. Key Features
+
+### 🎼 Album Cataloging
+Users can add new albums to the catalog by specifying details such as album name, artist, release date, and genre. The interface provides fields to input this data.
+
+#### How to Add an Album:
+1. Click the **“Add Album”** button in the main menu.
+2. Fill out the album details in the form (e.g., album name, artist, genre).
+3. Click **“Save”** to add the album to the catalog.
+
+### 🔍 Search & Filter
+The application allows users to search for specific albums or filter by artist, genre, or release year.
+
+#### How to Search:
+1. Enter the search term in the search bar at the top of the screen.
+2. Results will automatically update based on your search query.
+
+#### How to Filter:
+1. Click the **“Filter”** button.
+2. Choose the filter options (e.g., filter by genre, artist, etc.).
+3. Apply the filter to see relevant results.
+
+### 📑 Viewing Albums
+Once you’ve added albums, you can view the entire catalog in a table or grid layout, depending on your preferences. The view can be sorted by album name, artist, or year of release.
+
+---
+
+## ⚙️ 3. Settings & Configuration
+
+### 🎨 Customizing the Interface
+Users can customize the application’s layout, theme, or language by navigating to the settings section. There, they can choose display preferences such as switching between light and dark modes.
+
+### 💾 Data Backup & Import/Export
+To ensure data is safely stored, users can export their catalog to a CSV file. This allows you to back up the data or share it with others.
+
+#### How to Export Data:
+1. Go to the **“Settings”** menu.
+2. Select the **“Export Data”** option.
+3. Choose the file format (e.g., CSV) and save the file to your desired location.
+
+---
+
+## 🛠️ 4. Troubleshooting & Support
+If you encounter issues using the application, refer to the **Troubleshooting & Debugging Guide** section of the README, or contact support for further assistance. Common issues include missing data files, improper configurations, or unexpected application behavior.
+
+---
+
+## 🏆 Who Should Read This?
+This documentation is intended for users of all technical levels. Whether you’re a beginner or an experienced user, this guide will help you understand how to operate the software effectively. The **Getting Started** section is particularly useful for new users, while the **Advanced Features** section provides more in-depth instructions for experienced users.
+
+---
+
+## ✍️ Who Wrote This?
+This user documentation is written by the development team with contributions from technical writers to ensure clarity and accessibility. Developers have provided technical explanations, while the content has been tailored to user needs based on feedback and common queries.
+
+
+# BrightByte Music Cataloging Software - User Manual
+
+## 1. Introduction
+Welcome to the BrightByte Music Cataloging Software! This application helps users efficiently catalog their music collection, search for specific albums, and manage album data. This guide provides step-by-step instructions on installation, setup, and common tasks.
+
+## 2. Installation & Setup
+### 2.1 Clone the Repository
+Ensure Git is installed on your system. If not, download and install it from [git-scm.com](https://git-scm.com/).
+
+Clone the repository to your local machine using:
+```bash
+git clone https://github.com/Massiafz/Project.git
+```
+Navigate to the project directory:
+```bash
+cd Project
+```
+
+### 2.2 Install Dependencies
+Open a terminal in the project directory and run:
+```bash
+make install
+```
+This will install the necessary Python libraries and other dependencies.
+
+### 2.3 Running the Software
+Start the application by executing:
+```bash
+python main.py
+```
+This launches the BrightByte Music Cataloging Software and opens the main window.
+
+## 3. Using the Software
+### 3.1 Logging In or Signing Up
+- **Login:** Enter your username and password on the login page and click "Login."
+- **Sign Up:** Click "Sign Up," fill in the necessary details, and submit the form.
+- **Continue as Guest:** Click "Continue as Guest" to browse the catalog without logging in.
+
+### 3.2 Adding an Album to the Catalog
+1. Navigate to the Album Catalog page.
+2. Click "Add Album" to open the album form.
+3. Enter the following details:
+   - **Album Name:** Title of the album
+   - **Artist Name:** Name of the artist
+   - **Release Date:** Format YYYY-MM-DD
+   - **Genres:** Specify genres (e.g., Rock, Pop)
+   - **Cover URL:** Provide a URL for the album cover
+4. Click "Save" to add the album.
+
+### 3.3 Searching and Filtering Albums
+- **Search:** Use the search bar to find albums by name, artist, or other details.
+- **Apply Filters:**
+  1. Click the "Filter" dropdown menu.
+  2. Choose filters (e.g., Album Name, Artist, Genres, Release Date).
+  3. The search results will update accordingly.
+
+### 3.4 Viewing and Managing the Album Catalog
+- **View Albums:** The catalog displays album details like name, artist, release date, and genre.
+- **Sort Albums:** Click column headers to sort by album name or release date.
+- **Edit or Delete Albums:**
+  - Click "Edit" to modify album details, then "Save."
+  - Click "Delete" to remove an album (confirmation required).
+
+### 3.5 Exporting and Importing Data
+- **Export Data:**
+  1. Go to "Settings."
+  2. Click "Export Data."
+  3. Choose a format (e.g., CSV) and save the file.
+- **Import Data:**
+  1. Go to "Settings."
+  2. Click "Import Data."
+  3. Upload a properly formatted CSV file.
+
+### 3.6 Customizing the Application
+- **Change Theme:** Navigate to "Settings > Appearance" to switch between light and dark themes.
+- **Language Settings:** Change the application language in "Settings."
+
+## 4. Troubleshooting
+- **Application Doesn’t Open:** Ensure dependencies are installed and Python is correctly set up.
+- **Search Results Are Empty:** Check the query and filters. Ensure the album exists in the catalog.
+- **Data Import Issues:** Verify CSV formatting (columns like Album Name, Artist Name, etc.).
+
+## 5. Logging Out and Exiting
+- Click "Log Out" in the navigation bar to log out.
+- Close the window or use a keyboard shortcut (e.g., Alt+F4 on Windows) to exit.
+
+## 6. Conclusion
+Now that you've set up and learned to use BrightByte Music Cataloging Software, you can easily manage your album collection. If you need assistance, refer to the troubleshooting section or contact support.
+
+
+# FAQs (Frequently Asked Questions)
+### 1. The application doesn’t open. What should I do?
+Solution: Ensure that Python 3 and pip are installed correctly. Make sure all dependencies are installed by running:
+
+
+```
+make install
+```
+Check: Verify that you are in the correct directory when running the main.py file. Use:
+Edit
+```
+python main.py
+```
+
+### 2. I'm unable to log in. Why?
+Solution: Double-check your username and password. If you forget your credentials, try using the Sign Up button to create a new account, or continue as a guest if you're not concerned with logging in.
+
+Possible Cause: You may have mistyped your credentials. Ensure that your keyboard's Caps Lock is off.
+
+### 3. The search results are not showing any albums. What should I do?
+Solution: Ensure that your search query is correct, and try adjusting the filter settings (e.g., Album Name, Artist Name, Genres). If no results appear, check if the album is added to the catalog.
+
+Tip: If you’ve just added an album, refresh the catalog to view the new entry.
+
+### 4. How do I add a new album to the catalog?
+Solution: Go to the Catalog page and click the Add Album button. Fill out the form with album details, such as Album Name, Artist Name, and Release Date. Click Save once done.
+
+### 5. How do I edit or delete an album from the catalog?
+Solution: On the Catalog page, find the album you want to modify. Click the Edit button to update the album’s information or click Delete to remove it from the catalog. A confirmation will appear before deletion.
+
+### 6. How can I change the application theme?
+Solution: Go to the Settings menu, click on Appearance, and select your preferred theme (Light/Dark).
+
+### 7. My CSV file import didn’t work. What should I check?
+Solution: Ensure the CSV file is formatted correctly, with the necessary columns like Album Name, Artist Name, Release Date, etc. If the file structure doesn’t match the application’s expectations, the import may fail.
+
+### 8. I get an error when exporting data. What can I do?
+Solution: Check if the file you’re exporting to is open in another application (like Excel). Close the file and try exporting again.
+
+# Tooltips and Inline Help
+## Search Bar
+### Tooltip:
+"Enter the name of the album, artist, or any related keyword to search."
+
+### Inline Help:
+If the search bar is empty:
+"Type something here to search for albums."
+
+When there are no results:
+"No results found. Try a different search term."
+
+## Search Filter Dropdown
+### Tooltip:
+"Select a filter to narrow your search by Album Name, Artist Name, Genres, or Release Date."
+
+### Inline Help:
+When hovering over the filter dropdown:
+"Filter search results by specific criteria."
+
+## Add Album Button
+### Tooltip:
+"Click here to add a new album to your catalog."
+
+### Inline Help:
+"Fill out all fields in the form to add a new album."
+
+## Edit Button (in Catalog)
+### Tooltip:
+"Click here to edit this album’s information."
+
+### Inline Help:
+"Make changes to the album’s details and save."
+
+## Delete Button (in Catalog)
+### Tooltip:
+"Click here to remove this album from your catalog."
+
+Inline Help:
+"Are you sure you want to delete this album? This action cannot be undone."
+
+## Settings Menu
+### Tooltip:
+"Access application settings to change theme, language, or other preferences."
+
+### Inline Help:
+"Modify your preferences, such as theme or appearance settings, from here."
+
+## Export Data Button
+### Tooltip:
+"Click here to export your catalog data as a CSV file."
+
+### Inline Help:
+"Ensure no other program is using the export file before saving."
+
+## Import Data Button
+### Tooltip:
+"Click here to import album data from a CSV file."
+
+### Inline Help:
+"Select a valid CSV file containing album data to import."
+
+# Video Tutorial 🎥
+
+
+
+
+
+
