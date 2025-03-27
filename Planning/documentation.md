@@ -730,6 +730,96 @@ This documentation is intended for users of all technical levels. Whether you’
 This user documentation is written by the development team with contributions from technical writers to ensure clarity and accessibility. Developers have provided technical explanations, while the content has been tailored to user needs based on feedback and common queries.
 
 
+# BrightByte Music Cataloging Software - User Manual
+
+## 1. Introduction
+Welcome to the BrightByte Music Cataloging Software! This application helps users efficiently catalog their music collection, search for specific albums, and manage album data. This guide provides step-by-step instructions on installation, setup, and common tasks.
+
+## 2. Installation & Setup
+### 2.1 Clone the Repository
+Ensure Git is installed on your system. If not, download and install it from [git-scm.com](https://git-scm.com/).
+
+Clone the repository to your local machine using:
+```bash
+git clone https://github.com/Massiafz/Project.git
+```
+Navigate to the project directory:
+```bash
+cd Project
+```
+
+### 2.2 Install Dependencies
+Open a terminal in the project directory and run:
+```bash
+make install
+```
+This will install the necessary Python libraries and other dependencies.
+
+### 2.3 Running the Software
+Start the application by executing:
+```bash
+python main.py
+```
+This launches the BrightByte Music Cataloging Software and opens the main window.
+
+## 3. Using the Software
+### 3.1 Logging In or Signing Up
+- **Login:** Enter your username and password on the login page and click "Login."
+- **Sign Up:** Click "Sign Up," fill in the necessary details, and submit the form.
+- **Continue as Guest:** Click "Continue as Guest" to browse the catalog without logging in.
+
+### 3.2 Adding an Album to the Catalog
+1. Navigate to the Album Catalog page.
+2. Click "Add Album" to open the album form.
+3. Enter the following details:
+   - **Album Name:** Title of the album
+   - **Artist Name:** Name of the artist
+   - **Release Date:** Format YYYY-MM-DD
+   - **Genres:** Specify genres (e.g., Rock, Pop)
+   - **Cover URL:** Provide a URL for the album cover
+4. Click "Save" to add the album.
+
+### 3.3 Searching and Filtering Albums
+- **Search:** Use the search bar to find albums by name, artist, or other details.
+- **Apply Filters:**
+  1. Click the "Filter" dropdown menu.
+  2. Choose filters (e.g., Album Name, Artist, Genres, Release Date).
+  3. The search results will update accordingly.
+
+### 3.4 Viewing and Managing the Album Catalog
+- **View Albums:** The catalog displays album details like name, artist, release date, and genre.
+- **Sort Albums:** Click column headers to sort by album name or release date.
+- **Edit or Delete Albums:**
+  - Click "Edit" to modify album details, then "Save."
+  - Click "Delete" to remove an album (confirmation required).
+
+### 3.5 Exporting and Importing Data
+- **Export Data:**
+  1. Go to "Settings."
+  2. Click "Export Data."
+  3. Choose a format (e.g., CSV) and save the file.
+- **Import Data:**
+  1. Go to "Settings."
+  2. Click "Import Data."
+  3. Upload a properly formatted CSV file.
+
+### 3.6 Customizing the Application
+- **Change Theme:** Navigate to "Settings > Appearance" to switch between light and dark themes.
+- **Language Settings:** Change the application language in "Settings."
+
+## 4. Troubleshooting
+- **Application Doesn’t Open:** Ensure dependencies are installed and Python is correctly set up.
+- **Search Results Are Empty:** Check the query and filters. Ensure the album exists in the catalog.
+- **Data Import Issues:** Verify CSV formatting (columns like Album Name, Artist Name, etc.).
+
+## 5. Logging Out and Exiting
+- Click "Log Out" in the navigation bar to log out.
+- Close the window or use a keyboard shortcut (e.g., Alt+F4 on Windows) to exit.
+
+## 6. Conclusion
+Now that you've set up and learned to use BrightByte Music Cataloging Software, you can easily manage your album collection. If you need assistance, refer to the troubleshooting section or contact support.
+
+
 
 
 
