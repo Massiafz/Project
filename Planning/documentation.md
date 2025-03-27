@@ -524,5 +524,137 @@ make clean
 🎵 **Enjoy using BrightByte Music Cataloging Software!** 🎶
 
 
+## 🛠️ Troubleshooting & Debugging Guide
+
+### 📖 Overview
+This guide provides solutions to common installation, configuration, and runtime issues encountered while using this software. Follow the steps outlined below to diagnose and resolve problems efficiently.
+
+---
+
+## 🔧 1. Installation Issues
+
+### ❌ Problem: Error Installing Dependencies
+**Solution:**
+1. Verify that Python and pip are correctly installed:
+   ```sh
+   python --version
+   pip --version
+   ```
+2. If these commands fail, install or reinstall Python from the [official Python website](https://www.python.org/).
+3. If errors occur when installing from `requirements.txt`, try upgrading pip:
+   ```sh
+   python -m pip install --upgrade pip
+   ```
+4. Ensure all package names are correctly specified in `requirements.txt`.
+
+### ❌ Problem: Makefile Commands Fail (Linux/macOS)
+**Solution:**
+1. Check if `make` is installed:
+   ```sh
+   make --version
+   ```
+2. If missing, install it using:
+   - **Ubuntu/Debian:**
+     ```sh
+     sudo apt install make
+     ```
+   - **macOS (Homebrew):**
+     ```sh
+     brew install make
+     ```
+
+---
+
+## 🚀 2. Running Issues
+
+### ❌ Problem: Application Does Not Start
+**Solution:**
+1. Ensure you are in the correct project directory:
+   ```sh
+   cd path/to/project/Code
+   ```
+2. Try running the script manually:
+   ```sh
+   python main.py
+   ```
+3. If dependencies are missing, reinstall them:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+### ❌ Problem: Missing Data Files (e.g., `data.csv`)
+**Solution:**
+1. Verify that all required data files exist in the expected directories.
+2. If missing, obtain the necessary files from the project owner or use sample data if available.
+
+---
+
+## ⚙️ 3. Configuration Issues
+
+### ❌ Problem: Configuration Settings Not Applying
+**Solution:**
+1. Ensure configuration files (e.g., JSON, CSV) are in the correct directory.
+2. Check if they contain valid and properly formatted data.
+3. If using environment variables, verify that API keys or database credentials are correctly specified.
+
+---
+
+## 🐞 4. Debugging Tips
+
+### ❌ Problem: Unexpected Behavior or Crashes
+**Solution:**
+1. **Check Error Logs:** Review output logs for error messages.
+2. **Enable Debug Mode:**
+   ```python
+   import logging
+   logging.basicConfig(level=logging.DEBUG)
+   ```
+3. **Reproduce the Error:** Identify the exact steps leading to the issue.
+4. **Use a Debugger:**
+   ```python
+   import pdb; pdb.set_trace()
+   ```
+
+---
+
+## 🔍 5. Common Errors and Solutions
+
+### ❌ Error: `ModuleNotFoundError`
+**Solution:**
+1. Ensure all dependencies are installed:
+   ```sh
+   pip install -r requirements.txt
+   ```
+2. Reinstall a specific missing package:
+   ```sh
+   pip install <module_name>
+   ```
+
+### ❌ Error: Permission Denied (on Files or Directories)
+**Solution:**
+1. Ensure the user has the necessary permissions:
+   ```sh
+   chmod 777 <file_or_directory>
+   ```
+2. Run the command with administrator privileges:
+   - **Windows:** Open Command Prompt as Administrator.
+   - **Linux/macOS:** Prefix commands with `sudo`:
+     ```sh
+     sudo python main.py
+     ```
+
+---
+
+## 📞 6. Contact and Support
+If you continue to face issues, provide the following details when seeking support:
+- **Error messages or logs**
+- **Your operating system and Python version**
+- **Steps to reproduce the issue**
+
+This guide should help resolve most common issues efficiently. 🚀
+
+
+
+
 
 
