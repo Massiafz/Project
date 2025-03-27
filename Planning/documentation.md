@@ -653,6 +653,84 @@ If you continue to face issues, provide the following details when seeking suppo
 
 This guide should help resolve most common issues efficiently. 🚀
 
+## 📝 User / In-Application Documentation
+
+### 📖 Overview
+This section provides the necessary information for users to effectively interact with the software. It includes an overview of the application’s key features, how to use them, and what to expect at different stages of interaction.
+
+---
+
+## 🚀 1. Getting Started
+
+### 🎵 Launching the Application
+Once the software is installed and configured, launch the application by running the `main.py` file. This will open the program’s user interface (UI), where you can start interacting with the cataloging system.
+
+```sh
+python main.py
+```
+
+### 📂 First-Time Setup
+If this is your first time using the software, you may be prompted to upload your music data (e.g., album names, artist details). Ensure your files are in the correct format (CSV or another supported format) and follow the on-screen instructions for the initial setup.
+
+---
+
+## 🔑 2. Key Features
+
+### 🎼 Album Cataloging
+Users can add new albums to the catalog by specifying details such as album name, artist, release date, and genre. The interface provides fields to input this data.
+
+#### How to Add an Album:
+1. Click the **“Add Album”** button in the main menu.
+2. Fill out the album details in the form (e.g., album name, artist, genre).
+3. Click **“Save”** to add the album to the catalog.
+
+### 🔍 Search & Filter
+The application allows users to search for specific albums or filter by artist, genre, or release year.
+
+#### How to Search:
+1. Enter the search term in the search bar at the top of the screen.
+2. Results will automatically update based on your search query.
+
+#### How to Filter:
+1. Click the **“Filter”** button.
+2. Choose the filter options (e.g., filter by genre, artist, etc.).
+3. Apply the filter to see relevant results.
+
+### 📑 Viewing Albums
+Once you’ve added albums, you can view the entire catalog in a table or grid layout, depending on your preferences. The view can be sorted by album name, artist, or year of release.
+
+---
+
+## ⚙️ 3. Settings & Configuration
+
+### 🎨 Customizing the Interface
+Users can customize the application’s layout, theme, or language by navigating to the settings section. There, they can choose display preferences such as switching between light and dark modes.
+
+### 💾 Data Backup & Import/Export
+To ensure data is safely stored, users can export their catalog to a CSV file. This allows you to back up the data or share it with others.
+
+#### How to Export Data:
+1. Go to the **“Settings”** menu.
+2. Select the **“Export Data”** option.
+3. Choose the file format (e.g., CSV) and save the file to your desired location.
+
+---
+
+## 🛠️ 4. Troubleshooting & Support
+If you encounter issues using the application, refer to the **Troubleshooting & Debugging Guide** section of the README, or contact support for further assistance. Common issues include missing data files, improper configurations, or unexpected application behavior.
+
+---
+
+## 🏆 Who Should Read This?
+This documentation is intended for users of all technical levels. Whether you’re a beginner or an experienced user, this guide will help you understand how to operate the software effectively. The **Getting Started** section is particularly useful for new users, while the **Advanced Features** section provides more in-depth instructions for experienced users.
+
+---
+
+## ✍️ Who Wrote This?
+This user documentation is written by the development team with contributions from technical writers to ensure clarity and accessibility. Developers have provided technical explanations, while the content has been tailored to user needs based on feedback and common queries.
+
+
+
 
 
 
