@@ -923,6 +923,10 @@ Inline Help:
 
 # Video Tutorial 🎥
 
+# Inital Documentation: 
+- refer to the readme
+- API: reference 
+
 
 
 
