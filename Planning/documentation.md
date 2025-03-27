@@ -204,3 +204,216 @@ class AlbumCatalogApp(tk.Tk):
         self.search_bar.delete("1.0", tk.END)
         self.search("")
 ```
+
+```
+def login(self):
+    """
+    Handles user login authentication.
+
+    Retrieves the username and password from entry fields and verifies them
+    against the stored user credentials. If valid, the user is logged in,
+    the UI is updated to show catalog-related controls, and the catalog frame
+    is displayed. Otherwise, an error message is shown.
+    """
+    username = self.username_entry.get()
+    password = self.password_entry.get()
+    users = self.controller.users
+    if username in users and users[username]["password"] == password:
+        self.controller.current_user = username
+        messagebox.showinfo("Login", "Login successful!")
+        self.controller.search_button.pack(side="right", padx=10)
+        self.controller.search_bar.pack(side="right")
+        self.controller.filter_dropdown.pack(side="right", padx=10)
+        self.controller.frames["CatalogFrame"].refresh_button.grid()
+        self.controller.show_frame("CatalogFrame")
+        self.username_entry.delete(0, tk.END)
+        self.password_entry.delete(0, tk.END)
+    else:
+        messagebox.showerror("Error", "Invalid username or password.")
+
+def continue_as_guest(self):
+    """
+    Allows the user to proceed without logging in.
+
+    Sets the current user as 'Guest' and updates the UI to display catalog-related
+    controls before showing the catalog frame.
+    """
+    self.controller.current_user = "Guest"
+    messagebox.showinfo("Guest Login", "Continuing as guest.")
+    self.controller.search_button.pack(side="right", padx=10)
+    self.controller.search_bar.pack(side="right")
+    self.controller.filter_dropdown.pack(side="right", padx=10)
+    self.controller.frames["CatalogFrame"].refresh_button.grid()
+    self.controller.show_frame("CatalogFrame")
+
+def signup(self):
+    """
+    Handles new user registration.
+
+    Retrieves input from the signup form, validates the fields (e.g., checking
+    for empty fields, email format, and password confirmation), and adds the new
+    user to the stored credentials. If successful, the user is redirected to the login page.
+    """
+    username = self.username_entry.get()
+    email = self.email_entry.get()
+    password = self.password_entry.get()
+    confirm_password = self.confirm_password_entry.get()
+    if not username or not password or not email:
+        messagebox.showerror("Error", "Username and password cannot be empty.")
+        return
+    if username in self.controller.users:
+        messagebox.showerror("Error", "Username already exists.")
+        return
+    if password != confirm_password:
+        messagebox.showerror("Error", "Passwords do not match.")
+        return
+    if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email) is None:
+        messagebox.showerror("Error", "Email is invalid.")
+        return
+    self.controller.users[username] = {"email": email, "password": password}
+    self.controller.save_users()
+    messagebox.showinfo("Sign Up", "Account created successfully!")
+    self.controller.show_frame("LoginFrame")
+    self.username_entry.delete(0, tk.END)
+    self.password_entry.delete(0, tk.END)
+    self.confirm_password_entry.delete(0, tk.END)
+
+def refresh_album_list(self):
+    """
+    Refreshes the album catalog display.
+
+    Clears the current album list and reloads album data from the controller.
+    Uses a thread pool to handle image loading efficiently and updates the UI accordingly.
+    """
+    for existingAlbumItem in self.album_items:
+        if existingAlbumItem is not None:
+            existingAlbumItem.destroy()
+    self.album_items = []
+    if self.controller.search_results is not None:
+        album_arr_to_use = self.controller.search_results
+    else:
+        album_arr_to_use = self.controller.albums
+    for _ in range(len(album_arr_to_use)):
+        self.album_items.append(None)
+    self.album_cover_images = [None] * len(album_arr_to_use)
+    self.selected_album = None
+    currentRow = 0
+    self.refresh_album_threads = []
+    for index, album in enumerate(album_arr_to_use):
+        future = self.executor.submit(self.thread_function_refresh_albums, index, album, currentRow)
+        self.refresh_album_threads.append(future)
+        currentRow += 1
+
+def select_album(self, event, albumItem: tk.Frame):
+    """
+    Highlights the selected album in the catalog.
+
+    Changes the background color of the selected album to indicate selection,
+    while resetting all other albums to the default color.
+    """
+    for item in self.album_items:
+        if item is not None:
+            item.config(bg=NAV_BAR_SHADOW_2_COLOUR)
+            item.nametowidget("labelFrame").config(bg=NAV_BAR_SHADOW_2_COLOUR)
+            for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
+                item.nametowidget("labelFrame").nametowidget(widgetName).config(bg=NAV_BAR_SHADOW_2_COLOUR)
+    albumItem.config(bg=PRIMARY_BACKGROUND_COLOUR)
+    albumItem.nametowidget("labelFrame").config(bg=PRIMARY_BACKGROUND_COLOUR)
+    for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
+        albumItem.nametowidget("labelFrame").nametowidget(widgetName).config(bg=PRIMARY_BACKGROUND_COLOUR)
+    self.selected_album = albumItem
+```
+
+```
+import tkinter as tk
+from tkinter import ttk, messagebox, filedialog
+import os
+import re
+
+class AlbumCatalog:
+    
+    def add_album(self):
+        """
+        Opens a window to add a new album to the catalog.
+
+        The user can input details such as:
+        - Artist Name
+        - Album Name
+        - Release Date
+        - Genres
+        - Album Cover (optional, via file selection dialog)
+
+        If the required fields (Artist Name, Album Name, Release Date) are missing, an error message is shown.
+
+        The new album is then added to the controller's album list and saved.
+
+        Returns:
+            None
+        """
+        pass  # Function implementation here
+
+    def edit_album(self):
+        """
+        Opens a window to edit an existing album in the catalog.
+
+        The user can modify:
+        - Artist Name
+        - Album Name
+        - Release Date
+        - Genres
+        - Album Cover (either via URL or file selection)
+
+        If the required fields (Artist Name, Album Name, Release Date) are missing, an error message is shown.
+
+        The album details are updated in the controller and saved.
+
+        Returns:
+            None
+        """
+        pass  # Function implementation here
+
+    def delete_album(self):
+        """
+        Deletes the currently selected album from the catalog.
+
+        If no album is selected, an error message is displayed.
+        A confirmation dialog is presented before deletion.
+
+        The album is then removed from the controller's album list and saved.
+
+        Returns:
+            None
+        """
+        pass  # Function implementation here
+
+    def edit_account(self):
+        """
+        Opens a window to allow the current user to edit their account details.
+
+        The user can:
+        - Change their username (if available)
+        - Update their password (if correctly confirmed)
+
+        If the current password is incorrect, an error message is shown.
+        If the new password and confirmation do not match, an error is displayed.
+
+        After validation, changes are saved to the user database.
+
+        Returns:
+            None
+        """
+        pass  # Function implementation here
+
+    def logout(self):
+        """
+        Logs out the current user and returns to the login screen.
+
+        - The logged-in user is cleared from the system.
+        - The UI elements specific to a logged-in user are hidden.
+        - The login frame is displayed.
+
+        Returns:
+            None
+        """
+        pass  # Function implementation here
+```
