@@ -18,8 +18,8 @@ from concurrent.futures import ThreadPoolExecutor  # For a fixed-size thread poo
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
 # ---------------------------------------------------------------------------
-USERS_JSON = "Code/users.json"               # User login data.
-ALBUMS_CSV = "Code/cleaned_music_data.csv"       # Album catalog data.
+USERS_JSON = "users.json"               # User login data.
+ALBUMS_CSV = "cleaned_music_data.csv"       # Album catalog data.
 
 # UI colour constants.
 PRIMARY_BACKGROUND_COLOUR = "#527cc5"       
@@ -46,8 +46,8 @@ class AlbumCatalogApp(tk.Tk):
         
         # Load and set the window icon.
         # If "BrightByteLogo.png" does not exist, create a dummy image.
-        if os.path.exists("Code/BrightByteLogo.png"):
-            image = Image.open("Code/BrightByteLogo.png")
+        if os.path.exists("BrightByteLogo.png"):
+            image = Image.open("BrightByteLogo.png")
         else:
             # Create a dummy image (a plain gray image) for testing or fallback.
             image = Image.new("RGB", (1080, 1080), color=(200, 200, 200))
@@ -443,14 +443,14 @@ class CatalogFrame(tk.Frame):
                     print(f"Failed to load album cover for {albumURL}: {e}")
                     albumCover = self.album_cover_cache.get("default")
                     if albumCover is None:
-                        default_img = Image.open("Code/Eric.png")
+                        default_img = Image.open("Eric.png")
                         default_img = default_img.resize((150,150), Image.LANCZOS)
                         albumCover = ImageTk.PhotoImage(default_img)
                         self.album_cover_cache["default"] = albumCover
         else:
             albumCover = self.album_cover_cache.get("default")
             if albumCover is None:
-                default_img = Image.open("Code/Eric.png")
+                default_img = Image.open("Eric.png")
                 default_img = default_img.resize((150,150), Image.LANCZOS)
                 albumCover = ImageTk.PhotoImage(default_img)
                 self.album_cover_cache["default"] = albumCover
