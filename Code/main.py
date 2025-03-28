@@ -18,8 +18,8 @@ from concurrent.futures import ThreadPoolExecutor  # For a fixed-size thread poo
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
 # ---------------------------------------------------------------------------
-USERS_JSON = "users.json"               # User login data.
-ALBUMS_CSV = "cleaned_music_data.csv"       # Album catalog data.
+USERS_JSON = "Code/users.json"               # User login data.
+ALBUMS_CSV = "Code/cleaned_music_data.csv"       # Album catalog data.
 
 # UI colour constants.
 PRIMARY_BACKGROUND_COLOUR = "#527cc5"       
@@ -46,8 +46,8 @@ class AlbumCatalogApp(tk.Tk):
         
         # Load and set the window icon.
         # If "BrightByteLogo.png" does not exist, create a dummy image.
-        if os.path.exists("BrightByteLogo.png"):
-            image = Image.open("BrightByteLogo.png")
+        if os.path.exists("Code/BrightByteLogo.png"):
+            image = Image.open("Code/BrightByteLogo.png")
         else:
             # Create a dummy image (a plain gray image) for testing or fallback.
             image = Image.new("RGB", (1080, 1080), color=(200, 200, 200))
@@ -188,7 +188,8 @@ class AlbumCatalogApp(tk.Tk):
                         "Average Rating": row.get("Average Rating", "").strip(),
                         "Number of Ratings": row.get("Number of Ratings", "").strip(),
                         "Number of Reviews": row.get("Number of Reviews", "").strip(),
-                        "Cover URL": row.get("Cover URL", "").strip()
+                        "Cover URL": row.get("Cover URL", "").strip(),
+                        "Track List": row.get("Tracklist", "").strip()
                     }
                     albums.append(album)
         else:
@@ -395,18 +396,20 @@ class CatalogFrame(tk.Frame):
         buttonFrame.grid(row=2, column=0, columnspan=2, sticky="nsew")
         buttonFrame.anchor("center")
         
+        tracks_btn = ttk.Button(buttonFrame, text="Tracks", command=self.tracks_album)
+        tracks_btn.grid(row=0, column=0, padx=5, pady=10)
         add_btn = ttk.Button(buttonFrame, text="Add Album", command=self.add_album)
-        add_btn.grid(row=0, column=0, padx=5, pady=10)
+        add_btn.grid(row=0, column=1, padx=5, pady=10)
         edit_album_btn = ttk.Button(buttonFrame, text="Edit Album", command=self.edit_album)
-        edit_album_btn.grid(row=0, column=1, padx=5, pady=10)
+        edit_album_btn.grid(row=0, column=2, padx=5, pady=10)
         delete_btn = ttk.Button(buttonFrame, text="Delete Album", command=self.delete_album)
-        delete_btn.grid(row=0, column=2, padx=5, pady=10)
+        delete_btn.grid(row=0, column=3, padx=5, pady=10)
         edit_account_btn = ttk.Button(buttonFrame, text="Edit Account", command=self.edit_account)
-        edit_account_btn.grid(row=0, column=3, padx=5, pady=10)
+        edit_account_btn.grid(row=0, column=4, padx=5, pady=10)
         logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
-        logout_btn.grid(row=0, column=4, padx=5, pady=10)
+        logout_btn.grid(row=0, column=5, padx=5, pady=10)
         self.refresh_button = ttk.Button(buttonFrame, text="Refresh", command=self.controller.refresh_catalog)
-        self.refresh_button.grid(row=0, column=5, padx=5, pady=10)
+        self.refresh_button.grid(row=0, column=6, padx=5, pady=10)
         self.refresh_button.grid_remove()
     
     def thread_function_refresh_albums(self, index, album, currentRow):
@@ -440,14 +443,14 @@ class CatalogFrame(tk.Frame):
                     print(f"Failed to load album cover for {albumURL}: {e}")
                     albumCover = self.album_cover_cache.get("default")
                     if albumCover is None:
-                        default_img = Image.open("Eric.png")
+                        default_img = Image.open("Code/Eric.png")
                         default_img = default_img.resize((150,150), Image.LANCZOS)
                         albumCover = ImageTk.PhotoImage(default_img)
                         self.album_cover_cache["default"] = albumCover
         else:
             albumCover = self.album_cover_cache.get("default")
             if albumCover is None:
-                default_img = Image.open("Eric.png")
+                default_img = Image.open("Code/Eric.png")
                 default_img = default_img.resize((150,150), Image.LANCZOS)
                 albumCover = ImageTk.PhotoImage(default_img)
                 self.album_cover_cache["default"] = albumCover
@@ -513,6 +516,21 @@ class CatalogFrame(tk.Frame):
         for widgetName in ["albumNameLabel", "artistNameLabel", "genresLabel", "releaseDateLabel"]:
             albumItem.nametowidget("labelFrame").nametowidget(widgetName).config(bg=PRIMARY_BACKGROUND_COLOUR)
         self.selected_album = albumItem
+    
+    def tracks_album(self):
+        tracks_win = tk.Toplevel(self)
+        tracks_win.title("Tracks")
+        tracks_win.configure(background="#f0f0f0")
+        
+        if not self.selected_album:
+            messagebox.showerror("Error", "Please select an album to edit.")
+            return
+        index = self.album_items.index(self.selected_album)
+        album = self.controller.albums[index]
+        tracklist = album["Track List"].split("; ")
+        
+        for i in range(0, len(tracklist)):
+            ttk.Label(tracks_win, text=tracklist[i]).grid(row=i, column=0, padx=5, pady=5, sticky="w")
     
     def add_album(self):
         add_win = tk.Toplevel(self)
