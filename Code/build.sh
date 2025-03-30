@@ -21,6 +21,8 @@ if ! command -v pyinstaller &> /dev/null; then
     pip install pyinstaller --break-system-packages
 fi
 
+
+
 # Determine the correct separator for --add-data and --add-binary.
 # Use ':' for Linux/macOS and ';' for Windows.
 OS_TYPE=$(uname)

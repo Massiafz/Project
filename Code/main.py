@@ -34,6 +34,53 @@ URL_PATTERN = re.compile(
     r'\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$'
 )
 
+# Global variable to track login state
+current_user = None
+is_logged_in = False
+
+# Function to load users from JSON
+def load_users():
+    if os.path.exists('users.json'):
+        with open('users.json', 'r') as file:
+            return json.load(file)
+    else:
+        # Create empty users file if it doesn't exist
+        with open('users.json', 'w') as file:
+            json.dump([], file)
+        return []
+
+# Login function
+def login(username, password):
+    global current_user, is_logged_in
+    users = load_users()
+    
+    for user in users:
+        if user['username'] == username and user['password'] == password:  # In production, use hashed passwords!
+            current_user = user
+            is_logged_in = True
+            return True
+    
+    return False
+
+# Logout function
+def logout():
+    global current_user, is_logged_in
+    current_user = None
+    is_logged_in = False
+    print(f"DEBUG: User logged out. is_logged_in = {is_logged_in}")
+    messagebox.showinfo("Logout", "You have been logged out.")
+    self.controller.search_button.pack_forget()
+    self.controller.search_bar.pack_forget()
+    self.controller.filter_dropdown.pack_forget()
+    self.refresh_button.grid_remove()
+    # Return to the LoginFrame upon logout.
+    self.controller.show_frame("LoginFrame")
+
+# Function to check if user is logged in
+def check_login():
+    print(f"DEBUG: check_login called, is_logged_in = {is_logged_in}, current_user = {current_user}")
+    return is_logged_in
+
 # ---------------------------------------------------------------------------
 # Main Application Class: AlbumCatalogApp
 # ---------------------------------------------------------------------------
@@ -274,6 +321,11 @@ class LoginFrame(tk.Frame):
         users = self.controller.users
         if username in users and users[username]["password"] == password:
             self.controller.current_user = username
+            # Set global login state
+            global current_user, is_logged_in
+            current_user = username
+            is_logged_in = True
+            print(f"DEBUG: User '{username}' logged in successfully. is_logged_in = {is_logged_in}")
             messagebox.showinfo("Login", "Login successful!")
             self.controller.search_button.pack(side="right", padx=10)
             self.controller.search_bar.pack(side="right")
@@ -287,7 +339,11 @@ class LoginFrame(tk.Frame):
     
     def continue_as_guest(self):
         self.controller.current_user = "Guest"
-        messagebox.showinfo("Guest Login", "Continuing as guest.")
+        # Set global login state - guests should NOT be able to edit albums
+        global current_user, is_logged_in
+        current_user = "Guest"
+        is_logged_in = False  # Change to False - guests can't edit albums
+        messagebox.showinfo("Guest Login", "Continuing as guest. Note: Guests cannot add, edit, or delete albums.")
         self.controller.search_button.pack(side="right", padx=10)
         self.controller.search_bar.pack(side="right")
         self.controller.filter_dropdown.pack(side="right", padx=10)
@@ -533,6 +589,11 @@ class CatalogFrame(tk.Frame):
             ttk.Label(tracks_win, text=tracklist[i]).grid(row=i, column=0, padx=5, pady=5, sticky="w")
     
     def add_album(self):
+        print(f"DEBUG: add_album called. Login check result: {check_login()}")
+        if not check_login():
+            messagebox.showerror("Error", "You must be logged in to add an album")
+            return
+        
         add_win = tk.Toplevel(self)
         add_win.title("Add Album")
         add_win.configure(background="#f0f0f0")
@@ -604,6 +665,11 @@ class CatalogFrame(tk.Frame):
         ttk.Button(add_win, text="Save Album", command=save_album).grid(row=5, column=0, columnspan=2, pady=10)
     
     def edit_album(self):
+        print(f"DEBUG: edit_album called. Login check result: {check_login()}")
+        if not check_login():
+            messagebox.showerror("Error", "You must be logged in to edit an album")
+            return
+            
         if not self.selected_album:
             messagebox.showerror("Error", "Please select an album to edit.")
             return
@@ -690,6 +756,11 @@ class CatalogFrame(tk.Frame):
         ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=5, column=0, columnspan=2, pady=10)
     
     def delete_album(self):
+        print(f"DEBUG: delete_album called. Login check result: {check_login()}")
+        if not check_login():
+            messagebox.showerror("Error", "You must be logged in to delete an album")
+            return
+            
         if not self.selected_album:
             messagebox.showerror("Error", "Please select an album to delete.")
             return
@@ -764,6 +835,11 @@ class CatalogFrame(tk.Frame):
     
     def logout(self):
         self.controller.current_user = None
+        # Reset global login state
+        global current_user, is_logged_in
+        current_user = None
+        is_logged_in = False
+        print(f"DEBUG: User logged out. is_logged_in = {is_logged_in}")
         messagebox.showinfo("Logout", "You have been logged out.")
         self.controller.search_button.pack_forget()
         self.controller.search_bar.pack_forget()

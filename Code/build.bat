@@ -18,6 +18,7 @@ IF %ERRORLEVEL% NEQ 0 (
     pip install pyinstaller
 )
 
+
 REM Build the executable with PyInstaller.
 REM Note: On Windows, the separator for --add-data is a semicolon (;).
 pyinstaller --onefile --windowed ^
