@@ -205,7 +205,7 @@ class AlbumCatalogApp(tk.Tk):
         with open(ALBUMS_CSV, "w", newline="", encoding="utf-8") as csvfile:
             writer = csv.DictWriter(csvfile, ["Ranking", "Album", "Artist Name", "Release Date",
                                                 "Genres", "Average Rating", "Number of Ratings",
-                                                "Number of Reviews", "Cover URL"])
+                                                "Number of Reviews", "Cover URL", "Tracklist", "Deezer_ID"])
             writer.writeheader()
             for album in self.albums:
                 writer.writerow({
@@ -217,7 +217,9 @@ class AlbumCatalogApp(tk.Tk):
                     "Average Rating": album["Average Rating"],
                     "Number of Ratings": album["Number of Ratings"],
                     "Number of Reviews": album["Number of Reviews"],
-                    "Cover URL": album["Cover URL"]
+                    "Cover URL": album["Cover URL"],
+                    "Tracklist" : album["Tracklist"],
+                    "Deezer_ID" : album["Deezer_ID"]
                 })
     
     def load_albums_from_csv(self):
@@ -236,7 +238,8 @@ class AlbumCatalogApp(tk.Tk):
                         "Number of Ratings": row.get("Number of Ratings", "").strip(),
                         "Number of Reviews": row.get("Number of Reviews", "").strip(),
                         "Cover URL": row.get("Cover URL", "").strip(),
-                        "Track List": row.get("Tracklist", "").strip()
+                        "Tracklist": row.get("Tracklist", "").strip(),
+                        "Deezer_ID" : row.get("Deezer_ID", "").strip()
                     }
                     albums.append(album)
         else:
@@ -583,7 +586,7 @@ class CatalogFrame(tk.Frame):
             return
         index = self.album_items.index(self.selected_album)
         album = self.controller.albums[index]
-        tracklist = album["Track List"].split("; ")
+        tracklist = album["Tracklist"].split("; ")
         
         for i in range(0, len(tracklist)):
             ttk.Label(tracks_win, text=tracklist[i]).grid(row=i, column=0, padx=5, pady=5, sticky="w")
@@ -655,7 +658,9 @@ class CatalogFrame(tk.Frame):
                 "Average Rating": 0,
                 "Number of Ratings": 0,
                 "Number of Reviews": 0,
-                "Cover URL": cover_url
+                "Cover URL": cover_url,
+                "Tracklist": "",
+                "Deezer_ID" : ""
             }
             self.controller.albums.append(new_album)
             self.controller.save_albums()
