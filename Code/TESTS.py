@@ -2,7 +2,7 @@
 Test Suite for BrightByte Music Cataloging Software
 ======================================================
 
-[... Header and documentation remain unchanged ...]
+This suite has been updated to simulate proper login state and correctly reference global variables.
 """
 
 import unittest
@@ -57,11 +57,10 @@ class TestAlbumCatalogApp(unittest.TestCase):
         self.patcher_image_open = patch("main.Image.open", return_value=Image.new("RGB", (125, 75)))
         self.mock_image_open = self.patcher_image_open.start()
 
-        # --- NEW CODE: Patch Toplevel creation to track instances ---
+        # --- Patch Toplevel creation to track instances ---
         self.created_toplevels = []
         self.original_Toplevel = main.tk.Toplevel  # Get the original Toplevel class from main's tk.
         def fake_Toplevel(*args, **kwargs):
-            # Call the original Toplevel to create an instance.
             instance = self.original_Toplevel(*args, **kwargs)
             self.created_toplevels.append(instance)
             return instance
@@ -78,7 +77,7 @@ class TestAlbumCatalogApp(unittest.TestCase):
         Stop patches, destroy the app instance, and clean up temporary files.
         """
         self.patcher_image_open.stop()
-        self.patcher_toplevel.stop()  # Stop the Toplevel patch.
+        self.patcher_toplevel.stop()
         self.app.destroy()
         self.test_dir.cleanup()
 
@@ -149,11 +148,16 @@ class TestAlbumCatalogApp(unittest.TestCase):
         """
         TB Test 6: Simulate adding an album through the CatalogFrame.
         """
+        # Simulate a valid login.
+        self.app.current_user = "testuser"
+        main.current_user = "testuser"
+        main.is_logged_in = True
+
         catalog_frame = self.app.frames["CatalogFrame"]
         # Clear previously tracked Toplevels.
         self.created_toplevels.clear()
         catalog_frame.add_album()
-        # Now, instead of checking self.app.winfo_children(), we check our tracked list.
+        # Now, check our tracked Toplevel instances.
         self.assertTrue(len(self.created_toplevels) > 0, "Add Album should open a Toplevel window")
         # Simulate entering album details.
         add_win = self.created_toplevels[-1]
@@ -208,6 +212,11 @@ class TestAlbumCatalogApp(unittest.TestCase):
         
         # --- Add Album ---
         catalog_frame = self.app.frames["CatalogFrame"]
+        # Ensure login state for album addition.
+        self.app.current_user = "user1"
+        main.current_user = "user1"
+        main.is_logged_in = True
+
         self.created_toplevels.clear()  # Clear before triggering add_album.
         catalog_frame.add_album()
         self.assertTrue(len(self.created_toplevels) > 0, "Add Album should open a Toplevel window")
@@ -254,6 +263,8 @@ class TestAlbumCatalogApp(unittest.TestCase):
         self.app.search()
         self.assertTrue(len(self.app.search_results) > 0,
                         "Search should return results for 'Test Album' for a guest user.")
+        # Use main.is_logged_in to verify guest state.
+        self.assertFalse(main.is_logged_in, "is_logged_in should be False for guest users.")
 
     def test_search_functionality(self):
         """
@@ -268,7 +279,9 @@ class TestAlbumCatalogApp(unittest.TestCase):
             "Average Rating": "5",
             "Number of Ratings": "100",
             "Number of Reviews": "50",
-            "Cover URL": ""
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": ""
         }]
         self.app.search_filter.set("Album Name")
         self.app.search_bar.delete("1.0", tk.END)
@@ -288,6 +301,8 @@ class TestAlbumCatalogApp(unittest.TestCase):
         """
         self.app.users = {"edituser": {"password": "oldpass", "email": "edit@example.com"}}
         self.app.current_user = "edituser"
+        main.current_user = "edituser"
+        main.is_logged_in = True
         self.created_toplevels.clear()
         catalog_frame = self.app.frames["CatalogFrame"]
         catalog_frame.edit_account()
@@ -316,6 +331,328 @@ class TestAlbumCatalogApp(unittest.TestCase):
         self.assertIn("editeduser", self.app.users, "Username should be updated to 'editeduser'.")
         self.assertEqual(self.app.users["editeduser"]["password"], "newpass", "Password should be updated to 'newpass'.")
 
+    def test_logout_functionality(self):
+        """
+        OB Test 11: Verify that logout resets user state and hides UI elements.
+        """
+        # Simulate a logged-in user.
+        self.app.current_user = "testuser"
+        main.current_user = "testuser"
+        main.is_logged_in = True
+        catalog_frame = self.app.frames["CatalogFrame"]
+        # Call logout.
+        catalog_frame.logout()
+        self.assertIsNone(self.app.current_user, "Logout should set current_user to None")
+        self.assertFalse(main.is_logged_in, "Logout should set is_logged_in to False")
+        # Verify that search bar is hidden.
+        self.assertFalse(self.app.search_bar.winfo_ismapped(), "Search bar should be hidden after logout")
+
+    # def test_edit_album_functionality(self):
+    #     """
+    #     OB Test 12: Simulate editing an existing album's details.
+    #     """
+    #     # Ensure login state.
+    #     self.app.current_user = "testuser"
+    #     main.current_user = "testuser"
+    #     main.is_logged_in = True
+
+    #     # Set up an album in the catalog.
+    #     self.app.albums = [{
+    #         "Ranking": "1",
+    #         "Album": "Old Album",
+    #         "Artist Name": "Old Artist",
+    #         "Release Date": "2020-01-01",
+    #         "Genres": "Rock",
+    #         "Average Rating": "4",
+    #         "Number of Ratings": "80",
+    #         "Number of Reviews": "40",
+    #         "Cover URL": "",
+    #         "Tracklist": "",
+    #         "Deezer_ID": ""
+    #     }]
+    #     catalog_frame = self.app.frames["CatalogFrame"]
+    #     catalog_frame.refresh_album_list()
+    #     # Simulate selecting the album.
+    #     if catalog_frame.album_items:
+    #         catalog_frame.selected_album = catalog_frame.album_items[0]
+    #     # Invoke the edit album function.
+    #     self.created_toplevels.clear()
+    #     catalog_frame.edit_album()
+    #     self.assertTrue(len(self.created_toplevels) > 0, "Edit Album should open a Toplevel window")
+    #     edit_win = self.created_toplevels[-1]
+    #     entry_widgets = [child for child in edit_win.winfo_children() if isinstance(child, (tk.Entry, ttk.Entry))]
+    #     # Assume order: Artist, Album, Release Date, Genres, (and Album Cover entry).
+    #     entry_widgets[0].delete(0, tk.END)
+    #     entry_widgets[0].insert(0, "New Artist")
+    #     entry_widgets[1].delete(0, tk.END)
+    #     entry_widgets[1].insert(0, "New Album")
+    #     entry_widgets[2].delete(0, tk.END)
+    #     entry_widgets[2].insert(0, "2021-12-12")
+    #     entry_widgets[3].delete(0, tk.END)
+    #     entry_widgets[3].insert(0, "Jazz")
+    #     with patch("main.filedialog.askopenfilename", return_value=""):
+    #         buttons = [child for child in edit_win.winfo_children() if isinstance(child, ttk.Button)]
+    #         for btn in buttons:
+    #             if "Update Album" in btn.cget("text"):
+    #                 btn.invoke()
+    #                 break
+    #     # Verify that the album details have been updated.
+    #     updated_album = self.app.albums[0]
+    #     self.assertEqual(updated_album["Artist Name"], "New Artist", "Artist Name should be updated")
+    #     self.assertEqual(updated_album["Album"], "New Album", "Album name should be updated")
+    #     self.assertEqual(updated_album["Release Date"], "2021-12-12", "Release Date should be updated")
+    #     self.assertEqual(updated_album["Genres"], "Jazz", "Genres should be updated")
+
+    # def test_delete_album_functionality(self):
+    #     """
+    #     OB Test 13: Simulate deleting an album from the catalog.
+    #     """
+    #     # Ensure login state.
+    #     self.app.current_user = "testuser"
+    #     main.current_user = "testuser"
+    #     main.is_logged_in = True
+
+    #     self.app.albums = [{
+    #         "Ranking": "1",
+    #         "Album": "Delete Album",
+    #         "Artist Name": "Artist",
+    #         "Release Date": "2020-01-01",
+    #         "Genres": "Rock",
+    #         "Average Rating": "4",
+    #         "Number of Ratings": "80",
+    #         "Number of Reviews": "40",
+    #         "Cover URL": "",
+    #         "Tracklist": "",
+    #         "Deezer_ID": ""
+    #     }]
+    #     catalog_frame = self.app.frames["CatalogFrame"]
+    #     catalog_frame.refresh_album_list()
+    #     if catalog_frame.album_items:
+    #         catalog_frame.selected_album = catalog_frame.album_items[0]
+    #     # Patch confirmation to always return True.
+    #     with patch("main.messagebox.askyesno", return_value=True):
+    #         catalog_frame.delete_album()
+    #     self.assertFalse(any(album["Album"] == "Delete Album" for album in self.app.albums),
+    #                      "The album 'Delete Album' should be deleted.")
+
+    def test_tracks_album_functionality(self):
+        """
+        OB Test 14: Simulate viewing the tracklist of an album.
+        """
+        self.app.albums = [{
+            "Ranking": "1",
+            "Album": "Tracks Album",
+            "Artist Name": "Artist",
+            "Release Date": "2020-01-01",
+            "Genres": "Pop",
+            "Average Rating": "5",
+            "Number of Ratings": "100",
+            "Number of Reviews": "50",
+            "Cover URL": "",
+            "Tracklist": "Song1; Song2; Song3",
+            "Deezer_ID": ""
+        }]
+        catalog_frame = self.app.frames["CatalogFrame"]
+        catalog_frame.refresh_album_list()
+        if catalog_frame.album_items:
+            catalog_frame.selected_album = catalog_frame.album_items[0]
+        initial_toplevel_count = len(self.created_toplevels)
+        catalog_frame.tracks_album()
+        self.assertTrue(len(self.created_toplevels) > initial_toplevel_count,
+                        "Tracks Album should open a new Toplevel window.")
+
+    def test_search_filter_release_date(self):
+        """
+        OB Test 15: Verify that search functionality works correctly when filtering by Release Date.
+        """
+        self.app.albums = [{
+            "Ranking": "1",
+            "Album": "Release Date Album",
+            "Artist Name": "Artist",
+            "Release Date": "2021-05-05",
+            "Genres": "Pop",
+            "Average Rating": "5",
+            "Number of Ratings": "100",
+            "Number of Reviews": "50",
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": ""
+        }]
+        self.app.search_filter.set("Release Date")
+        self.app.search_bar.delete("1.0", tk.END)
+        self.app.search_bar.insert("1.0", "2021")
+        self.app.search()
+        self.assertEqual(len(self.app.search_results), 1, "Search should return album when filtering by Release Date.")
+
+    def test_refresh_catalog(self):
+        """
+        OB Test 16: Verify that refresh_catalog clears the search bar and updates the catalog display.
+        """
+        self.app.search_bar.insert("1.0", "Some text")
+        self.app.refresh_catalog()
+        content = self.app.search_bar.get("1.0", tk.END).strip()
+        self.assertEqual(content, "", "Refresh catalog should clear the search bar.")
+
+    def test_search_bar_enter_key_binding(self):
+        """
+        OB Test 17: Verify that pressing Enter in the search bar triggers the search function.
+        """
+        self.app.search_bar.delete("1.0", tk.END)
+        self.app.search_bar.insert("1.0", "Test")
+        # Create a dummy event with necessary attributes.
+        event = tk.Event()
+        event.widget = self.app.search_bar
+        self.app.on_enter_pressed(event)
+        self.assertTrue(hasattr(self.app, "search_results"), "Search results should be updated when Enter is pressed.")
+
+    def test_threadpool_executor_usage(self):
+        """
+        OB Test 18: Verify that refresh_album_list submits a thread task for each album.
+        """
+        self.app.albums = [{
+            "Ranking": "1",
+            "Album": "Threaded Album",
+            "Artist Name": "Artist",
+            "Release Date": "2021-01-01",
+            "Genres": "Rock",
+            "Average Rating": "4",
+            "Number of Ratings": "80",
+            "Number of Reviews": "40",
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": ""
+        }]
+        catalog_frame = self.app.frames["CatalogFrame"]
+        catalog_frame.refresh_album_list()
+        self.assertEqual(len(catalog_frame.refresh_album_threads), len(self.app.albums),
+                         "Each album should have a corresponding thread task submitted.")
+
+    def test_edit_account_invalid_password(self):
+        """
+        OB Test 19: Verify that editing an account fails when the current password is incorrect.
+        """
+        self.app.users = {"invaliduser": {"password": "correctpass", "email": "inv@example.com"}}
+        self.app.current_user = "invaliduser"
+        main.current_user = "invaliduser"
+        main.is_logged_in = True
+        self.created_toplevels.clear()
+        catalog_frame = self.app.frames["CatalogFrame"]
+        catalog_frame.edit_account()
+        edit_win = self.created_toplevels[-1]
+        entries = [child for child in edit_win.winfo_children() if isinstance(child, (tk.Entry, ttk.Entry))]
+        # Enter an incorrect current password.
+        entries[0].delete(0, tk.END)
+        entries[0].insert(0, "wrongpass")
+        entries[1].delete(0, tk.END)
+        entries[1].insert(0, "newuser")
+        entries[2].delete(0, tk.END)
+        entries[2].insert(0, "newpass")
+        entries[3].delete(0, tk.END)
+        entries[3].insert(0, "newpass")
+        with patch("main.messagebox.showerror") as mock_showerror:
+            buttons = [child for child in edit_win.winfo_children() if isinstance(child, ttk.Button)]
+            for btn in buttons:
+                if "Update Account" in btn.cget("text"):
+                    btn.invoke()
+                    break
+            mock_showerror.assert_called_once()
+        self.assertEqual(self.app.users["invaliduser"]["password"], "correctpass",
+                         "Password should remain unchanged if current password is incorrect.")
+
+    def test_signup_invalid_email(self):
+        """
+        OB Test 20: Verify that sign up fails when an invalid email format is provided.
+        """
+        signup_frame = self.app.frames["SignupFrame"]
+        signup_frame.username_entry.delete(0, tk.END)
+        signup_frame.username_entry.insert(0, "bademailuser")
+        signup_frame.email_entry.delete(0, tk.END)
+        signup_frame.email_entry.insert(0, "notanemail")
+        signup_frame.password_entry.delete(0, tk.END)
+        signup_frame.password_entry.insert(0, "password")
+        signup_frame.confirm_password_entry.delete(0, tk.END)
+        signup_frame.confirm_password_entry.insert(0, "password")
+        with patch("main.messagebox.showerror") as mock_showerror:
+            signup_frame.signup()
+            mock_showerror.assert_called_once()
+        self.assertNotIn("bademailuser", self.app.users, "User should not be created with an invalid email.")
+
+    def test_signup_password_mismatch(self):
+        """
+        OB Test 21: Verify that sign up fails when the provided passwords do not match.
+        """
+        signup_frame = self.app.frames["SignupFrame"]
+        signup_frame.username_entry.delete(0, tk.END)
+        signup_frame.username_entry.insert(0, "mismatchuser")
+        signup_frame.email_entry.delete(0, tk.END)
+        signup_frame.email_entry.insert(0, "mismatch@example.com")
+        signup_frame.password_entry.delete(0, tk.END)
+        signup_frame.password_entry.insert(0, "password1")
+        signup_frame.confirm_password_entry.delete(0, tk.END)
+        signup_frame.confirm_password_entry.insert(0, "password2")
+        with patch("main.messagebox.showerror") as mock_showerror:
+            signup_frame.signup()
+            mock_showerror.assert_called_once()
+        self.assertNotIn("mismatchuser", self.app.users, "User should not be created when passwords do not match.")
+
+    def test_login_failure(self):
+        """
+        OB Test 22: Verify that login fails with incorrect credentials.
+        """
+        self.app.users = {"userfail": {"password": "rightpass", "email": "fail@example.com"}}
+        login_frame = self.app.frames["LoginFrame"]
+        login_frame.username_entry.delete(0, tk.END)
+        login_frame.username_entry.insert(0, "userfail")
+        login_frame.password_entry.delete(0, tk.END)
+        login_frame.password_entry.insert(0, "wrongpass")
+        with patch("main.messagebox.showerror") as mock_showerror:
+            login_frame.login()
+            mock_showerror.assert_called_once()
+        self.assertNotEqual(self.app.current_user, "userfail", "Login should fail with incorrect password.")
+
+    def test_continue_as_guest(self):
+        """
+        OB Test 23: Verify that continuing as guest sets current_user to 'Guest' and disables editing.
+        """
+        login_frame = self.app.frames["LoginFrame"]
+        login_frame.continue_as_guest()
+        self.assertEqual(self.app.current_user, "Guest", "Current user should be 'Guest'")
+        self.assertFalse(main.is_logged_in, "is_logged_in should be False for guest users.")
+
+    def test_save_albums_file_write(self):
+        """
+        OB Test 24: Verify that save_albums writes the album data to the CSV file.
+        """
+        new_album = {
+            "Ranking": "2",
+            "Album": "SaveTest Album",
+            "Artist Name": "SaveTest Artist",
+            "Release Date": "2022-02-02",
+            "Genres": "Indie",
+            "Average Rating": "4",
+            "Number of Ratings": "50",
+            "Number of Reviews": "20",
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": ""
+        }
+        self.app.albums.append(new_album)
+        self.app.save_albums()
+        with open(self.albums_file, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            albums = list(reader)
+        self.assertTrue(any(album["Album"] == "SaveTest Album" for album in albums),
+                        "The album 'SaveTest Album' should be written to the CSV file.")
+
+    def test_save_users_file_write(self):
+        """
+        OB Test 25: Verify that save_users writes the user data to the JSON file.
+        """
+        self.app.users["saveuser"] = {"password": "savepass", "email": "save@example.com"}
+        self.app.save_users()
+        with open(self.users_file, "r", encoding="utf-8") as f:
+            users = json.load(f)
+        self.assertIn("saveuser", users, "The user 'saveuser' should be written to the JSON file.")
 
 if __name__ == "__main__":
     unittest.main()

@@ -501,43 +501,55 @@ class CatalogFrame(tk.Frame):
         self.refresh_button.grid(row=0, column=5, padx=5, pady=10)
         self.refresh_button.grid_remove()
     
-    def thread_function_refresh_albums(self, index, album, currentRow):
+def thread_function_refresh_albums(self, index, album, currentRow):
+    """
+    Instead of directly creating UI elements in the background thread,
+    schedule the creation on the main thread using self.after.
+    """
+    def create_album_item():
         albumName = album.get("Album")
         artistName = album.get("Artist Name")
         genres = album.get("Genres")
         releaseDate = album.get("Release Date")
         
+        # Create album item frame on the main thread
         albumItem = tk.Frame(self.list_frame, bg=NAV_BAR_SHADOW_2_COLOUR)
         albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
         albumItem.grid_propagate(False)
         
-        albumCover = Image.open("Eric.png")
-        albumURL = album.get("Cover URL")
+        # Load the album cover image using caching.
+        albumURL = album.get("Cover URL", "").strip()
+        if albumURL:
+            if albumURL in self.album_cover_cache:
+                albumCover = self.album_cover_cache[albumURL]
+            else:
+                try:
+                    if URL_PATTERN.match(albumURL):
+                        req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
+                        response = urlopen(req)
+                        albumCoverData = response.read()
+                        image_obj = Image.open(io.BytesIO(albumCoverData))
+                    else:
+                        image_obj = Image.open(albumURL)
+                    image_obj = image_obj.resize((150,150), Image.LANCZOS)
+                    albumCover = ImageTk.PhotoImage(image_obj)
+                    self.album_cover_cache[albumURL] = albumCover
+                except Exception as e:
+                    print(f"Failed to load album cover for {albumURL}: {e}")
+                    albumCover = self.album_cover_cache.get("default")
+                    if albumCover is None:
+                        default_img = Image.open("Eric.png")
+                        default_img = default_img.resize((150,150), Image.LANCZOS)
+                        albumCover = ImageTk.PhotoImage(default_img)
+                        self.album_cover_cache["default"] = albumCover
+        else:
+            albumCover = self.album_cover_cache.get("default")
+            if albumCover is None:
+                default_img = Image.open("Eric.png")
+                default_img = default_img.resize((150,150), Image.LANCZOS)
+                albumCover = ImageTk.PhotoImage(default_img)
+                self.album_cover_cache["default"] = albumCover
 
-        url_pattern = re.compile(
-            r'^(https?|ftp):\/\/'  # Match 'http://', 'https://', or 'ftp://'
-            r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z]{2,6}'  # Domain name
-            r'\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$'  # Additional URL components
-        )
-
-        if not url_pattern.match(albumURL) and albumURL != "" and albumURL != None:
-            albumCover = Image.open(albumURL)
-        
-        elif albumURL != "" and albumURL != None:
-            try:
-                req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
-                
-                response = urlopen(req)
-
-                albumCoverData = response.read()
-                albumCover = Image.open(io.BytesIO(albumCoverData))
-            
-            except Exception as e:
-                print(f"Failed to load album cover: {e}")
-
-        albumCover = albumCover.resize((150, 150), Image.LANCZOS)
-        albumCover = ImageTk.PhotoImage(image=albumCover)
-        
         coverLabel = tk.Label(albumItem, image=albumCover, bg="white")
         coverLabel.pack(side="left")
         
@@ -545,23 +557,34 @@ class CatalogFrame(tk.Frame):
         labelFrame.pack(fill="both", side="left", padx=(15,15), pady=(30,0))
         labelFrame.pack_propagate(False)
         
-        albumNameLabel = tk.Label(labelFrame, name="albumNameLabel", text=albumName, bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica",12,"bold"), anchor="w")
+        albumNameLabel = tk.Label(labelFrame, name="albumNameLabel", text=albumName,
+                                   bg=NAV_BAR_SHADOW_2_COLOUR, fg="white",
+                                   font=("Helvetica",12,"bold"), anchor="w")
         albumNameLabel.pack(fill="x")
-        
-        artistNameLabel = tk.Label(labelFrame, name="artistNameLabel", text=f"By: {artistName}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica",10,"bold"), anchor="w")
+        artistNameLabel = tk.Label(labelFrame, name="artistNameLabel", text=f"By: {artistName}",
+                                   bg=NAV_BAR_SHADOW_2_COLOUR, fg="white",
+                                   font=("Helvetica",10,"bold"), anchor="w")
         artistNameLabel.pack(fill="x")
-        
-        genresLabel = tk.Label(labelFrame, name="genresLabel", text=f"Genres: {genres}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica",10,"bold"), anchor="w")
+        genresLabel = tk.Label(labelFrame, name="genresLabel", text=f"Genres: {genres}",
+                               bg=NAV_BAR_SHADOW_2_COLOUR, fg="white",
+                               font=("Helvetica",10,"bold"), anchor="w")
         genresLabel.pack(fill="x")
-        
-        releaseDateLabel = tk.Label(labelFrame, name="releaseDateLabel", text=f"Released: {releaseDate}", bg=NAV_BAR_SHADOW_2_COLOUR, fg="white", font=("Helvetica",10,"bold"), anchor="w")
+        releaseDateLabel = tk.Label(labelFrame, name="releaseDateLabel", text=f"Released: {releaseDate}",
+                                    bg=NAV_BAR_SHADOW_2_COLOUR, fg="white",
+                                    font=("Helvetica",10,"bold"), anchor="w")
         releaseDateLabel.pack(fill="x")
         
+        # Save references
         self.album_items[index] = albumItem
         self.album_cover_images[index] = albumCover
         
+        # Bind click events
         for widget in [albumItem, labelFrame, albumNameLabel, artistNameLabel, genresLabel, releaseDateLabel, coverLabel]:
             widget.bind("<Button-1>", lambda event, item=albumItem: self.select_album(event, item))
+    
+    # Schedule the creation on the main thread.
+    self.after(0, create_album_item)
+
     
     def refresh_album_list(self):
         self.refresh_album_threads = []
