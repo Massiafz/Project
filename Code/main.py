@@ -620,7 +620,7 @@ class CatalogFrame(tk.Frame):
             return
         
         if not self.selected_album:
-            messagebox.showerror("Error", "Please select an album to edit.")
+            messagebox.showerror("Error", "Please select an album to favourite.")
             return
         index = self.album_items.index(self.selected_album)
         album = self.controller.albums[index]
