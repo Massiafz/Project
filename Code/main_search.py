@@ -433,7 +433,6 @@ class CatalogFrame(tk.Frame):
         albumItem.grid(row=currentRow, column=0, padx=15, pady=15)
         albumItem.grid_propagate(False)
         
-<<<<<<< HEAD
         albumCover = Image.open("Eric.png")
         albumURL = album.get("Cover URL")
 
@@ -460,40 +459,6 @@ class CatalogFrame(tk.Frame):
 
         albumCover = albumCover.resize((150, 150), Image.LANCZOS)
         albumCover = ImageTk.PhotoImage(image=albumCover)
-=======
-        # Determine album cover image using caching.
-        albumURL = album.get("Cover URL", "").strip()
-        if albumURL:
-            if albumURL in self.album_cover_cache:
-                albumCover = self.album_cover_cache[albumURL]
-            else:
-                try:
-                    if URL_PATTERN.match(albumURL):
-                        req = Request(albumURL, headers={"User-Agent": "Mozilla/5.0"})
-                        response = urlopen(req)
-                        albumCoverData = response.read()
-                        image_obj = Image.open(io.BytesIO(albumCoverData))
-                    else:
-                        image_obj = Image.open(albumURL)
-                    image_obj = image_obj.resize((150,150), Image.LANCZOS)
-                    albumCover = ImageTk.PhotoImage(image_obj)
-                    self.album_cover_cache[albumURL] = albumCover
-                except Exception as e:
-                    print(f"Failed to load album cover for {albumURL}: {e}")
-                    albumCover = self.album_cover_cache.get("default")
-                    if albumCover is None:
-                        default_img = Image.open("Eric.png")
-                        default_img = default_img.resize((150,150), Image.LANCZOS)
-                        albumCover = ImageTk.PhotoImage(default_img)
-                        self.album_cover_cache["default"] = albumCover
-        else:
-            albumCover = self.album_cover_cache.get("default")
-            if albumCover is None:
-                default_img = Image.open("Eric.png")
-                default_img = default_img.resize((150,150), Image.LANCZOS)
-                albumCover = ImageTk.PhotoImage(default_img)
-                self.album_cover_cache["default"] = albumCover
->>>>>>> a6d1d6889082cb5fca15ef6b184510e537b9e12b
         
         coverLabel = tk.Label(albumItem, image=albumCover, bg="white")
         coverLabel.pack(side="left")
