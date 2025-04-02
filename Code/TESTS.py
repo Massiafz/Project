@@ -347,93 +347,91 @@ class TestAlbumCatalogApp(unittest.TestCase):
         # Verify that search bar is hidden.
         self.assertFalse(self.app.search_bar.winfo_ismapped(), "Search bar should be hidden after logout")
 
-    # def test_edit_album_functionality(self):
-    #     """
-    #     OB Test 12: Simulate editing an existing album's details.
-    #     """
-    #     # Ensure login state.
-    #     self.app.current_user = "testuser"
-    #     main.current_user = "testuser"
-    #     main.is_logged_in = True
+    def test_edit_album_functionality(self):
+        """
+        OB Test 12: Simulate editing an existing album's details.
+        """
+        # Ensure login state.
+        self.app.current_user = "testuser"
+        main.current_user = "testuser"
+        main.is_logged_in = True
 
-    #     # Set up an album in the catalog.
-    #     self.app.albums = [{
-    #         "Ranking": "1",
-    #         "Album": "Old Album",
-    #         "Artist Name": "Old Artist",
-    #         "Release Date": "2020-01-01",
-    #         "Genres": "Rock",
-    #         "Average Rating": "4",
-    #         "Number of Ratings": "80",
-    #         "Number of Reviews": "40",
-    #         "Cover URL": "",
-    #         "Tracklist": "",
-    #         "Deezer_ID": ""
-    #     }]
-    #     catalog_frame = self.app.frames["CatalogFrame"]
-    #     catalog_frame.refresh_album_list()
-    #     # Simulate selecting the album.
-    #     if catalog_frame.album_items:
-    #         catalog_frame.selected_album = catalog_frame.album_items[0]
-    #     # Invoke the edit album function.
-    #     self.created_toplevels.clear()
-    #     catalog_frame.edit_album()
-    #     self.assertTrue(len(self.created_toplevels) > 0, "Edit Album should open a Toplevel window")
-    #     edit_win = self.created_toplevels[-1]
-    #     entry_widgets = [child for child in edit_win.winfo_children() if isinstance(child, (tk.Entry, ttk.Entry))]
-    #     # Assume order: Artist, Album, Release Date, Genres, (and Album Cover entry).
-    #     entry_widgets[0].delete(0, tk.END)
-    #     entry_widgets[0].insert(0, "New Artist")
-    #     entry_widgets[1].delete(0, tk.END)
-    #     entry_widgets[1].insert(0, "New Album")
-    #     entry_widgets[2].delete(0, tk.END)
-    #     entry_widgets[2].insert(0, "2021-12-12")
-    #     entry_widgets[3].delete(0, tk.END)
-    #     entry_widgets[3].insert(0, "Jazz")
-    #     with patch("main.filedialog.askopenfilename", return_value=""):
-    #         buttons = [child for child in edit_win.winfo_children() if isinstance(child, ttk.Button)]
-    #         for btn in buttons:
-    #             if "Update Album" in btn.cget("text"):
-    #                 btn.invoke()
-    #                 break
-    #     # Verify that the album details have been updated.
-    #     updated_album = self.app.albums[0]
-    #     self.assertEqual(updated_album["Artist Name"], "New Artist", "Artist Name should be updated")
-    #     self.assertEqual(updated_album["Album"], "New Album", "Album name should be updated")
-    #     self.assertEqual(updated_album["Release Date"], "2021-12-12", "Release Date should be updated")
-    #     self.assertEqual(updated_album["Genres"], "Jazz", "Genres should be updated")
+        # Set up an album in the catalog.
+        self.app.albums = [{
+            "Ranking": "1",
+            "Album": "Old Album",
+            "Artist Name": "Old Artist",
+            "Release Date": "2020-01-01",
+            "Genres": "Rock",
+            "Average Rating": "4",
+            "Number of Ratings": "80",
+            "Number of Reviews": "40",
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": ""
+        }]
+        catalog_frame = self.app.frames["CatalogFrame"]
+        catalog_frame.refresh_album_list()
+        # Simulate selecting the album.
+        if catalog_frame.album_items:
+            catalog_frame.selected_album = catalog_frame.album_items[0]
+        # Invoke the edit album function.
+        self.created_toplevels.clear()
+        catalog_frame.edit_album(True)
+        self.assertTrue(len(self.created_toplevels) > 0, "Edit Album should open a Toplevel window")
+        edit_win = self.created_toplevels[-1]
+        entry_widgets = [child for child in edit_win.winfo_children() if isinstance(child, (tk.Entry, ttk.Entry))]
+        # Assume order: Artist, Album, Release Date, Genres, (and Album Cover entry).
+        entry_widgets[0].delete(0, tk.END)
+        entry_widgets[0].insert(0, "New Artist")
+        entry_widgets[1].delete(0, tk.END)
+        entry_widgets[1].insert(0, "New Album")
+        entry_widgets[2].delete(0, tk.END)
+        entry_widgets[2].insert(0, "2021-12-12")
+        entry_widgets[3].delete(0, tk.END)
+        entry_widgets[3].insert(0, "Jazz")
+        with patch("main.filedialog.askopenfilename", return_value=""):
+            buttons = [child for child in edit_win.winfo_children() if isinstance(child, ttk.Button)]
+            for btn in buttons:
+                if "Update Album" in btn.cget("text"):
+                    btn.invoke()
+                    break
+        # Verify that the album details have been updated.
+        updated_album = self.app.albums[0]
+        self.assertEqual(updated_album["Artist Name"], "New Artist", "Artist Name should be updated")
+        self.assertEqual(updated_album["Album"], "New Album", "Album name should be updated")
+        self.assertEqual(updated_album["Release Date"], "2021-12-12", "Release Date should be updated")
+        self.assertEqual(updated_album["Genres"], "Jazz", "Genres should be updated")
 
-    # def test_delete_album_functionality(self):
-    #     """
-    #     OB Test 13: Simulate deleting an album from the catalog.
-    #     """
-    #     # Ensure login state.
-    #     self.app.current_user = "testuser"
-    #     main.current_user = "testuser"
-    #     main.is_logged_in = True
+    def test_delete_album_functionality(self):
+        """
+        OB Test 13: Simulate deleting an album from the catalog.
+        """
+        # Ensure login state.
+        self.app.current_user = "testuser"
+        main.current_user = "testuser"
+        main.is_logged_in = True
 
-    #     self.app.albums = [{
-    #         "Ranking": "1",
-    #         "Album": "Delete Album",
-    #         "Artist Name": "Artist",
-    #         "Release Date": "2020-01-01",
-    #         "Genres": "Rock",
-    #         "Average Rating": "4",
-    #         "Number of Ratings": "80",
-    #         "Number of Reviews": "40",
-    #         "Cover URL": "",
-    #         "Tracklist": "",
-    #         "Deezer_ID": ""
-    #     }]
-    #     catalog_frame = self.app.frames["CatalogFrame"]
-    #     catalog_frame.refresh_album_list()
-    #     if catalog_frame.album_items:
-    #         catalog_frame.selected_album = catalog_frame.album_items[0]
-    #     # Patch confirmation to always return True.
-    #     with patch("main.messagebox.askyesno", return_value=True):
-    #         catalog_frame.delete_album()
-    #     self.assertFalse(any(album["Album"] == "Delete Album" for album in self.app.albums),
-    #                      "The album 'Delete Album' should be deleted.")
+        self.app.albums = [{
+            "Ranking": "1",
+            "Album": "Delete Album",
+            "Artist Name": "Artist",
+            "Release Date": "2020-01-01",
+            "Genres": "Rock",
+            "Average Rating": "4",
+            "Number of Ratings": "80",
+            "Number of Reviews": "40",
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": ""
+        }]
+        catalog_frame = self.app.frames["CatalogFrame"]
+        catalog_frame.refresh_album_list()
+        catalog_frame.selected_album = catalog_frame.album_items[0]
+        # Patch confirmation to always return True.
+        catalog_frame.delete_album(True)
+        self.assertFalse(any(album["Album"] == "Delete Album" for album in self.app.albums),
+                         "The album 'Delete Album' should be deleted.")
 
     def test_tracks_album_functionality(self):
         """

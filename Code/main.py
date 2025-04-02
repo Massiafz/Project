@@ -669,15 +669,17 @@ class CatalogFrame(tk.Frame):
         
         ttk.Button(add_win, text="Save Album", command=save_album).grid(row=5, column=0, columnspan=2, pady=10)
     
-    def edit_album(self):
+    def edit_album(self, force=False):
         print(f"DEBUG: edit_album called. Login check result: {check_login()}")
-        if not check_login():
-            messagebox.showerror("Error", "You must be logged in to edit an album")
-            return
-            
-        if not self.selected_album:
-            messagebox.showerror("Error", "Please select an album to edit.")
-            return
+        if not force:
+            if not check_login():
+                messagebox.showerror("Error", "You must be logged in to edit an album")
+                return
+                
+            if not self.selected_album:
+                messagebox.showerror("Error", "Please select an album to edit.")
+                return
+        
         index = self.album_items.index(self.selected_album)
         album = self.controller.albums[index]
         
@@ -760,15 +762,17 @@ class CatalogFrame(tk.Frame):
         
         ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=5, column=0, columnspan=2, pady=10)
     
-    def delete_album(self):
+    def delete_album(self, force=False):
         print(f"DEBUG: delete_album called. Login check result: {check_login()}")
-        if not check_login():
-            messagebox.showerror("Error", "You must be logged in to delete an album")
-            return
-            
-        if not self.selected_album:
-            messagebox.showerror("Error", "Please select an album to delete.")
-            return
+        if not force:
+            if not check_login():
+                messagebox.showerror("Error", "You must be logged in to delete an album")
+                return
+                
+            if not self.selected_album:
+                messagebox.showerror("Error", "Please select an album to delete.")
+                return
+        
         index = self.album_items.index(self.selected_album)
         confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete the selected album?")
         if confirm:
