@@ -417,7 +417,60 @@ class AlbumCatalog:
         """
         pass  # Function implementation here
 ```
+```
+def favourite_album(self):
+    """
+    Toggles the favourite status of the selected album for the logged-in user.
 
+    If the user is not logged in, an error message is displayed.
+    If no album is selected, an error message is shown.
+    The album is added to or removed from the user's favourites list.
+    Updates are saved to the user database.
+
+    Returns:
+        None
+    """
+    pass  # Function implementation here
+
+def unfavourite_album(self):
+    """
+    Removes the selected album from the user's favourites list.
+
+    If the user is not logged in, an error message is displayed.
+    If no album is selected, an error message is shown.
+    If the album is not in the favourites list, an error is displayed.
+    The album is removed from the favourites list and updates are saved.
+
+    Returns:
+        None
+    """
+    pass  # Function implementation here
+
+def favourites(self):
+    """
+    Retrieves and displays the user's favourite albums.
+
+    If the user has no favourite albums, an error message is displayed.
+    The favourite albums are added to the search results list.
+    The catalog frame is refreshed and displayed.
+
+    Returns:
+        None
+    """
+    pass  # Function implementation here
+
+def refresh_catalog(self):
+    """
+    Clears the search bar and refreshes the album catalog.
+
+    - The search bar text is cleared.
+    - The catalog is refreshed by performing a new search.
+
+    Returns:
+        None
+    """
+    pass  # Function implementation here
+```
 # System Architecture
 ![Screenshot 2025-03-13 112310](https://github.com/user-attachments/assets/1f9ce149-e0f3-41f3-b905-da9d08cb6c67)
 ![Screenshot 2025-03-04 213451](https://github.com/user-attachments/assets/dcf2bc50-284f-4300-8599-4d676abfbd3d)
