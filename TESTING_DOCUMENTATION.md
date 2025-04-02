@@ -115,4 +115,4 @@ The tests are organized into three main categories:
   *Expected Result:* The search results list contains only the albums whose "Deezer_ID" matches the user's favourites.
 
 ## Conclusion
-Every function—from file I/O and multi-threading to UI events, user authentication, album management, and now the favourites functionality—is thoroughly tested. The comprehensive documentation and inline comments serve to clarify the purpose and expected behavior of each test, ensuring that all aspects of the BrightByte Music Cataloging Software are robustly verified.
+Every function—from file I/O and multi-threading to UI events, user authentication, album management, and the favourites functionality—is thoroughly tested. The comprehensive documentation and inline comments serve to clarify the purpose and expected behavior of each test, ensuring that all aspects of the BrightByte Music Cataloging Software are robustly verified.
