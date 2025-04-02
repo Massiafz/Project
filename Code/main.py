@@ -124,6 +124,8 @@ class AlbumCatalogApp(tk.Tk):
         title.pack(anchor="w", padx=5, pady=40)
         
         # Set up search widgets.
+        self.favourites_button = tk.Button(nav_bar, text="Favourites", command=self.favourites)
+        self.favourites_button.pack_forget()
         self.search_button = tk.Button(nav_bar, text="Search", command=self.search)
         self.search_button.pack_forget()
         self.search_bar = tk.Text(nav_bar, font=("Calibri", 12), height=1, width=50)
@@ -286,6 +288,23 @@ class AlbumCatalogApp(tk.Tk):
             frame.refresh_album_list()
         frame.tkraise()
     
+    def favourites(self):
+        self.search_results = []
+        
+        # print(self.albums)
+        if not "favourites" in self.users[current_user]:
+            messagebox.showerror("No Results", "No favourites yet.")
+        else:
+            for id in self.users[current_user]["favourites"]:
+                for album in self.albums:
+                    if album["Deezer_ID"] == id:
+                        self.search_results.append(album)
+                        break
+                
+        frame = self.frames["CatalogFrame"]
+        frame.refresh_album_list()
+        frame.tkraise()
+    
     def refresh_catalog(self):
         self.search_bar.delete("1.0", tk.END)
         self.search("")
@@ -330,6 +349,7 @@ class LoginFrame(tk.Frame):
             is_logged_in = True
             print(f"DEBUG: User '{username}' logged in successfully. is_logged_in = {is_logged_in}")
             messagebox.showinfo("Login", "Login successful!")
+            self.controller.favourites_button.pack(side="right", padx=10)
             self.controller.search_button.pack(side="right", padx=10)
             self.controller.search_bar.pack(side="right")
             self.controller.filter_dropdown.pack(side="right", padx=10)
@@ -457,18 +477,20 @@ class CatalogFrame(tk.Frame):
         
         tracks_btn = ttk.Button(buttonFrame, text="Tracks", command=self.tracks_album)
         tracks_btn.grid(row=0, column=0, padx=5, pady=10)
+        self.favourite_btn = ttk.Button(buttonFrame, text="Favourite Album", command=self.favourite_album)
+        self.favourite_btn.grid(row=0, column=1, padx=5, pady=10)
         add_btn = ttk.Button(buttonFrame, text="Add Album", command=self.add_album)
-        add_btn.grid(row=0, column=1, padx=5, pady=10)
+        add_btn.grid(row=0, column=2, padx=5, pady=10)
         edit_album_btn = ttk.Button(buttonFrame, text="Edit Album", command=self.edit_album)
-        edit_album_btn.grid(row=0, column=2, padx=5, pady=10)
+        edit_album_btn.grid(row=0, column=3, padx=5, pady=10)
         delete_btn = ttk.Button(buttonFrame, text="Delete Album", command=self.delete_album)
-        delete_btn.grid(row=0, column=3, padx=5, pady=10)
+        delete_btn.grid(row=0, column=4, padx=5, pady=10)
         edit_account_btn = ttk.Button(buttonFrame, text="Edit Account", command=self.edit_account)
-        edit_account_btn.grid(row=0, column=4, padx=5, pady=10)
+        edit_account_btn.grid(row=0, column=5, padx=5, pady=10)
         logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
-        logout_btn.grid(row=0, column=5, padx=5, pady=10)
+        logout_btn.grid(row=0, column=6, padx=5, pady=10)
         self.refresh_button = ttk.Button(buttonFrame, text="Refresh", command=self.controller.refresh_catalog)
-        self.refresh_button.grid(row=0, column=6, padx=5, pady=10)
+        self.refresh_button.grid(row=0, column=7, padx=5, pady=10)
         self.refresh_button.grid_remove()
     
     def thread_function_refresh_albums(self, index, album, currentRow):
@@ -590,6 +612,27 @@ class CatalogFrame(tk.Frame):
         
         for i in range(0, len(tracklist)):
             ttk.Label(tracks_win, text=tracklist[i]).grid(row=i, column=0, padx=5, pady=5, sticky="w")
+            
+    def favourite_album(self):
+        print(f"DEBUG: favourite_album called. Login check result: {check_login()}")
+        if not check_login():
+            messagebox.showerror("Error", "You must be logged in to favourite an album")
+            return
+        
+        if not self.selected_album:
+            messagebox.showerror("Error", "Please select an album to favourite.")
+            return
+        index = self.album_items.index(self.selected_album)
+        album = self.controller.albums[index]
+        
+        if not "favourites" in self.controller.users[current_user]:
+            self.controller.users[current_user]["favourites"] = [album["Deezer_ID"]]
+        elif album["Deezer_ID"] in self.controller.users[current_user]["favourites"]:
+            self.controller.users[current_user]["favourites"].remove(album["Deezer_ID"])
+        else:
+            self.controller.users[current_user]["favourites"].append(album["Deezer_ID"])
+            
+        self.controller.save_users()
     
     def add_album(self):
         print(f"DEBUG: add_album called. Login check result: {check_login()}")
@@ -850,6 +893,7 @@ class CatalogFrame(tk.Frame):
         is_logged_in = False
         print(f"DEBUG: User logged out. is_logged_in = {is_logged_in}")
         messagebox.showinfo("Logout", "You have been logged out.")
+        self.controller.favourites_button.pack_forget()
         self.controller.search_button.pack_forget()
         self.controller.search_bar.pack_forget()
         self.controller.filter_dropdown.pack_forget()

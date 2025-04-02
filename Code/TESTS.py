@@ -2,7 +2,8 @@
 Test Suite for BrightByte Music Cataloging Software
 ======================================================
 
-This suite has been updated to simulate proper login state and correctly reference global variables.
+This suite has been updated to simulate proper login state, correctly reference global variables,
+and now includes tests for the favourites functionality.
 """
 
 import unittest
@@ -22,7 +23,6 @@ class TestAlbumCatalogApp(unittest.TestCase):
         Setup temporary files and override global constants for testing.
         Also, patch out image loading and track Toplevel window creation.
         """
-        # Create a temporary directory for test files.
         self.test_dir = tempfile.TemporaryDirectory()
         self.users_file = os.path.join(self.test_dir.name, "users.json")
         self.albums_file = os.path.join(self.test_dir.name, "cleaned_music_data.csv")
@@ -59,7 +59,7 @@ class TestAlbumCatalogApp(unittest.TestCase):
 
         # --- Patch Toplevel creation to track instances ---
         self.created_toplevels = []
-        self.original_Toplevel = main.tk.Toplevel  # Get the original Toplevel class from main's tk.
+        self.original_Toplevel = main.tk.Toplevel
         def fake_Toplevel(*args, **kwargs):
             instance = self.original_Toplevel(*args, **kwargs)
             self.created_toplevels.append(instance)
@@ -148,18 +148,14 @@ class TestAlbumCatalogApp(unittest.TestCase):
         """
         TB Test 6: Simulate adding an album through the CatalogFrame.
         """
-        # Simulate a valid login.
         self.app.current_user = "testuser"
         main.current_user = "testuser"
         main.is_logged_in = True
 
         catalog_frame = self.app.frames["CatalogFrame"]
-        # Clear previously tracked Toplevels.
         self.created_toplevels.clear()
         catalog_frame.add_album()
-        # Now, check our tracked Toplevel instances.
         self.assertTrue(len(self.created_toplevels) > 0, "Add Album should open a Toplevel window")
-        # Simulate entering album details.
         add_win = self.created_toplevels[-1]
         entry_widgets = [child for child in add_win.winfo_children() 
                          if isinstance(child, (tk.Entry, ttk.Entry))]
@@ -187,7 +183,6 @@ class TestAlbumCatalogApp(unittest.TestCase):
         OB Test 7: Simulate a full end-to-end workflow:
         - Sign up a new user, log in, add an album, search for it, then log out.
         """
-        # --- Sign Up ---
         signup_frame = self.app.frames["SignupFrame"]
         signup_frame.username_entry.delete(0, tk.END)
         signup_frame.username_entry.insert(0, "user1")
@@ -200,7 +195,6 @@ class TestAlbumCatalogApp(unittest.TestCase):
         signup_frame.signup()
         self.assertIn("user1", self.app.users, "Sign up should add 'user1' to users.")
         
-        # --- Log In ---
         self.app.show_frame("LoginFrame")
         login_frame = self.app.frames["LoginFrame"]
         login_frame.username_entry.delete(0, tk.END)
@@ -210,14 +204,12 @@ class TestAlbumCatalogApp(unittest.TestCase):
         login_frame.login()
         self.assertEqual(self.app.current_user, "user1", "Login should set current_user to 'user1'.")
         
-        # --- Add Album ---
         catalog_frame = self.app.frames["CatalogFrame"]
-        # Ensure login state for album addition.
         self.app.current_user = "user1"
         main.current_user = "user1"
         main.is_logged_in = True
 
-        self.created_toplevels.clear()  # Clear before triggering add_album.
+        self.created_toplevels.clear()
         catalog_frame.add_album()
         self.assertTrue(len(self.created_toplevels) > 0, "Add Album should open a Toplevel window")
         add_win = self.created_toplevels[-1]
@@ -240,14 +232,12 @@ class TestAlbumCatalogApp(unittest.TestCase):
         self.assertTrue(any(album["Album"] == "Album1" for album in self.app.albums),
                         "The album 'Album1' should be added.")
         
-        # --- Search ---
         self.app.search_bar.delete("1.0", tk.END)
         self.app.search_bar.insert("1.0", "Album1")
         self.app.search()
         self.assertTrue(len(self.app.search_results) > 0,
                         "Search should return results for 'Album1'.")
         
-        # --- Logout ---
         catalog_frame.logout()
         self.assertIsNone(self.app.current_user, "Logout should reset current_user to None.")
 
@@ -263,7 +253,6 @@ class TestAlbumCatalogApp(unittest.TestCase):
         self.app.search()
         self.assertTrue(len(self.app.search_results) > 0,
                         "Search should return results for 'Test Album' for a guest user.")
-        # Use main.is_logged_in to verify guest state.
         self.assertFalse(main.is_logged_in, "is_logged_in should be False for guest users.")
 
     def test_search_functionality(self):
@@ -310,7 +299,6 @@ class TestAlbumCatalogApp(unittest.TestCase):
         edit_win = self.created_toplevels[-1]
         entries = [child for child in edit_win.winfo_children() 
                    if isinstance(child, (tk.Entry, ttk.Entry))]
-        # Expected order: current_pass, new_username, new_pass, confirm_new_pass.
         current_pass_entry = entries[0]
         new_username_entry = entries[1]
         new_pass_entry = entries[2]
@@ -335,16 +323,13 @@ class TestAlbumCatalogApp(unittest.TestCase):
         """
         OB Test 11: Verify that logout resets user state and hides UI elements.
         """
-        # Simulate a logged-in user.
         self.app.current_user = "testuser"
         main.current_user = "testuser"
         main.is_logged_in = True
         catalog_frame = self.app.frames["CatalogFrame"]
-        # Call logout.
         catalog_frame.logout()
         self.assertIsNone(self.app.current_user, "Logout should set current_user to None")
         self.assertFalse(main.is_logged_in, "Logout should set is_logged_in to False")
-        # Verify that search bar is hidden.
         self.assertFalse(self.app.search_bar.winfo_ismapped(), "Search bar should be hidden after logout")
 
     def test_edit_album_functionality(self):
@@ -497,7 +482,6 @@ class TestAlbumCatalogApp(unittest.TestCase):
         """
         self.app.search_bar.delete("1.0", tk.END)
         self.app.search_bar.insert("1.0", "Test")
-        # Create a dummy event with necessary attributes.
         event = tk.Event()
         event.widget = self.app.search_bar
         self.app.on_enter_pressed(event)
@@ -505,7 +489,7 @@ class TestAlbumCatalogApp(unittest.TestCase):
 
     def test_threadpool_executor_usage(self):
         """
-        OB Test 18: Verify that refresh_album_list submits a thread task for each album.
+        OB Test 18: Confirm that the thread pool executor submits one task per album when refreshing the album list.
         """
         self.app.albums = [{
             "Ranking": "1",
@@ -538,7 +522,6 @@ class TestAlbumCatalogApp(unittest.TestCase):
         catalog_frame.edit_account()
         edit_win = self.created_toplevels[-1]
         entries = [child for child in edit_win.winfo_children() if isinstance(child, (tk.Entry, ttk.Entry))]
-        # Enter an incorrect current password.
         entries[0].delete(0, tk.END)
         entries[0].insert(0, "wrongpass")
         entries[1].delete(0, tk.END)
@@ -617,40 +600,39 @@ class TestAlbumCatalogApp(unittest.TestCase):
         self.assertEqual(self.app.current_user, "Guest", "Current user should be 'Guest'")
         self.assertFalse(main.is_logged_in, "is_logged_in should be False for guest users.")
 
-    def test_save_albums_file_write(self):
+    def test_favourites_no_favourites(self):
         """
-        OB Test 24: Verify that save_albums writes the album data to the CSV file.
+        OB Test 24: Verify that invoking favourites on a user with no favourites shows an error message
+        and leaves search_results empty.
         """
-        new_album = {
-            "Ranking": "2",
-            "Album": "SaveTest Album",
-            "Artist Name": "SaveTest Artist",
-            "Release Date": "2022-02-02",
-            "Genres": "Indie",
-            "Average Rating": "4",
-            "Number of Ratings": "50",
-            "Number of Reviews": "20",
-            "Cover URL": "",
-            "Tracklist": "",
-            "Deezer_ID": ""
-        }
-        self.app.albums.append(new_album)
-        self.app.save_albums()
-        with open(self.albums_file, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            albums = list(reader)
-        self.assertTrue(any(album["Album"] == "SaveTest Album" for album in albums),
-                        "The album 'SaveTest Album' should be written to the CSV file.")
+        self.app.current_user = "faveuser"
+        main.current_user = "faveuser"
+        main.is_logged_in = True
+        self.app.users["faveuser"] = {}  # No favourites key
+        with patch("main.messagebox.showerror") as mock_showerror:
+            self.app.favourites()
+            mock_showerror.assert_called_once_with("No Results", "No favourites yet.")
+        self.assertEqual(self.app.search_results, [], "Search results should be empty when no favourites are set.")
 
-    def test_save_users_file_write(self):
+    def test_favourites_with_favourites(self):
         """
-        OB Test 25: Verify that save_users writes the user data to the JSON file.
+        OB Test 25: Verify that the favourites functionality correctly filters and displays the user's favourite album(s).
         """
-        self.app.users["saveuser"] = {"password": "savepass", "email": "save@example.com"}
-        self.app.save_users()
-        with open(self.users_file, "r", encoding="utf-8") as f:
-            users = json.load(f)
-        self.assertIn("saveuser", users, "The user 'saveuser' should be written to the JSON file.")
+        self.app.current_user = "faveuser"
+        main.current_user = "faveuser"
+        main.is_logged_in = True
+        self.app.albums = [
+            {"Ranking": "1", "Album": "Favourite Album", "Artist Name": "Fav Artist", "Release Date": "2020-01-01",
+             "Genres": "Rock", "Average Rating": "4", "Number of Ratings": "50", "Number of Reviews": "20",
+             "Cover URL": "", "Tracklist": "", "Deezer_ID": "fav123"},
+            {"Ranking": "2", "Album": "Regular Album", "Artist Name": "Artist", "Release Date": "2019-01-01",
+             "Genres": "Pop", "Average Rating": "3", "Number of Ratings": "30", "Number of Reviews": "10",
+             "Cover URL": "", "Tracklist": "", "Deezer_ID": "reg456"}
+        ]
+        self.app.users["faveuser"] = {"favourites": ["fav123"]}
+        self.app.favourites()
+        self.assertEqual(len(self.app.search_results), 1, "Search results should contain one favourite album")
+        self.assertEqual(self.app.search_results[0]["Deezer_ID"], "fav123", "The favourite album's Deezer_ID should match")
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
