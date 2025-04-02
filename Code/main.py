@@ -231,17 +231,17 @@ class AlbumCatalogApp(tk.Tk):
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     album = {
-                        "Ranking": row.get("Ranking", "").strip(),
-                        "Album": row.get("Album", "").strip(),
-                        "Artist Name": row.get("Artist Name", "").strip(),
-                        "Release Date": row.get("Release Date", "").strip(),
-                        "Genres": row.get("Genres", "").strip(),
-                        "Average Rating": row.get("Average Rating", "").strip(),
-                        "Number of Ratings": row.get("Number of Ratings", "").strip(),
-                        "Number of Reviews": row.get("Number of Reviews", "").strip(),
-                        "Cover URL": row.get("Cover URL", "").strip(),
-                        "Tracklist": row.get("Tracklist", "").strip(),
-                        "Deezer_ID" : row.get("Deezer_ID", "").strip()
+                        "Ranking": (row.get("Ranking") or "").strip(),
+                        "Album": (row.get("Album") or "").strip(),
+                        "Artist Name": (row.get("Artist Name") or "").strip(),
+                        "Release Date": (row.get("Release Date") or "").strip(),
+                        "Genres": (row.get("Genres") or "").strip(),
+                        "Average Rating": (row.get("Average Rating") or "").strip(),
+                        "Number of Ratings": (row.get("Number of Ratings") or "").strip(),
+                        "Number of Reviews": (row.get("Number of Reviews") or "").strip(),
+                        "Cover URL": (row.get("Cover URL") or "").strip(),
+                        "Tracklist": (row.get("Tracklist") or "").strip(),
+                        "Deezer_ID": (row.get("Deezer_ID") or "").strip()
                     }
                     albums.append(album)
         else:
@@ -618,21 +618,25 @@ class CatalogFrame(tk.Frame):
         if not check_login():
             messagebox.showerror("Error", "You must be logged in to favourite an album")
             return
-        
+
         if not self.selected_album:
             messagebox.showerror("Error", "Please select an album to favourite.")
             return
+
+        # Determine whether we are working with search results or the full album list
+        album_list = self.controller.search_results if self.controller.search_results else self.controller.albums
         index = self.album_items.index(self.selected_album)
-        album = self.controller.albums[index]
-        
+        album = album_list[index]
+
         if not "favourites" in self.controller.users[current_user]:
             self.controller.users[current_user]["favourites"] = [album["Deezer_ID"]]
         elif album["Deezer_ID"] in self.controller.users[current_user]["favourites"]:
             self.controller.users[current_user]["favourites"].remove(album["Deezer_ID"])
         else:
             self.controller.users[current_user]["favourites"].append(album["Deezer_ID"])
-            
+
         self.controller.save_users()
+        messagebox.showinfo("Success", f"Album '{album['Album']}' has been updated in your favourites.")
     
     def add_album(self):
         print(f"DEBUG: add_album called. Login check result: {check_login()}")
