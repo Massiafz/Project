@@ -91,7 +91,9 @@ Some ways to address this would be to either download the album images individua
 - UI Updates
 
 ### Iteration 3
-> *(Not yet started)* -> Plans include: Personalized recommendations, song sample playback
+- Favourites Section
+- Songs for each album
+- Access rights
 
 
 ## 📝 More Documentation 📝
