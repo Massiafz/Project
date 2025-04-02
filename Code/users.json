@@ -52,5 +52,10 @@
             "1131265.0",
             "7203293.0"
         ]
+    },
+    "lab11": {
+        "email": "moksh@gmail.com",
+        "password": "test",
+        "favourites": []
     }
 }

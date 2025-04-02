@@ -479,18 +479,20 @@ class CatalogFrame(tk.Frame):
         tracks_btn.grid(row=0, column=0, padx=5, pady=10)
         self.favourite_btn = ttk.Button(buttonFrame, text="Favourite Album", command=self.favourite_album)
         self.favourite_btn.grid(row=0, column=1, padx=5, pady=10)
+        self.unfavourite_btn = ttk.Button(buttonFrame, text="Unfavourite Album", command=self.unfavourite_album)
+        self.unfavourite_btn.grid(row=0, column=2, padx=5, pady=10)  # New button for unfavouriting albums
         add_btn = ttk.Button(buttonFrame, text="Add Album", command=self.add_album)
-        add_btn.grid(row=0, column=2, padx=5, pady=10)
+        add_btn.grid(row=0, column=3, padx=5, pady=10)
         edit_album_btn = ttk.Button(buttonFrame, text="Edit Album", command=self.edit_album)
-        edit_album_btn.grid(row=0, column=3, padx=5, pady=10)
+        edit_album_btn.grid(row=0, column=4, padx=5, pady=10)
         delete_btn = ttk.Button(buttonFrame, text="Delete Album", command=self.delete_album)
-        delete_btn.grid(row=0, column=4, padx=5, pady=10)
+        delete_btn.grid(row=0, column=5, padx=5, pady=10)
         edit_account_btn = ttk.Button(buttonFrame, text="Edit Account", command=self.edit_account)
-        edit_account_btn.grid(row=0, column=5, padx=5, pady=10)
+        edit_account_btn.grid(row=0, column=6, padx=5, pady=10)
         logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
-        logout_btn.grid(row=0, column=6, padx=5, pady=10)
+        logout_btn.grid(row=0, column=7, padx=5, pady=10)
         self.refresh_button = ttk.Button(buttonFrame, text="Refresh", command=self.controller.refresh_catalog)
-        self.refresh_button.grid(row=0, column=7, padx=5, pady=10)
+        self.refresh_button.grid(row=0, column=8, padx=5, pady=10)
         self.refresh_button.grid_remove()
     
     def thread_function_refresh_albums(self, index, album, currentRow):
@@ -616,11 +618,11 @@ class CatalogFrame(tk.Frame):
     def favourite_album(self):
         print(f"DEBUG: favourite_album called. Login check result: {check_login()}")
         if not check_login():
-            messagebox.showerror("Error", "You must be logged in to favourite an album")
+            messagebox.showerror("Error", "You must be logged in to favourite or unfavourite an album.")
             return
 
         if not self.selected_album:
-            messagebox.showerror("Error", "Please select an album to favourite.")
+            messagebox.showerror("Error", "Please select an album to favourite or unfavourite.")
             return
 
         # Determine whether we are working with search results or the full album list
@@ -628,15 +630,49 @@ class CatalogFrame(tk.Frame):
         index = self.album_items.index(self.selected_album)
         album = album_list[index]
 
-        if not "favourites" in self.controller.users[current_user]:
-            self.controller.users[current_user]["favourites"] = [album["Deezer_ID"]]
-        elif album["Deezer_ID"] in self.controller.users[current_user]["favourites"]:
+        # Check if the user has a favourites list
+        if "favourites" not in self.controller.users[current_user]:
+            self.controller.users[current_user]["favourites"] = []
+
+        # Toggle the album's favourite status
+        if album["Deezer_ID"] in self.controller.users[current_user]["favourites"]:
             self.controller.users[current_user]["favourites"].remove(album["Deezer_ID"])
+            messagebox.showinfo("Success", f"Album '{album['Album']}' has been removed from your favourites.")
         else:
             self.controller.users[current_user]["favourites"].append(album["Deezer_ID"])
+            messagebox.showinfo("Success", f"Album '{album['Album']}' has been added to your favourites.")
 
+        # Save the updated favourites list
         self.controller.save_users()
-        messagebox.showinfo("Success", f"Album '{album['Album']}' has been updated in your favourites.")
+    
+    def unfavourite_album(self):
+        """Remove the selected album from the user's favourites."""
+        print(f"DEBUG: unfavourite_album called. Login check result: {check_login()}")
+        if not check_login():
+            messagebox.showerror("Error", "You must be logged in to unfavourite an album.")
+            return
+
+        if not self.selected_album:
+            messagebox.showerror("Error", "Please select an album to unfavourite.")
+            return
+
+        # Determine whether we are working with search results or the full album list
+        album_list = self.controller.search_results if self.controller.search_results else self.controller.albums
+        index = self.album_items.index(self.selected_album)
+        album = album_list[index]
+
+        # Check if the user has a favourites list
+        if "favourites" not in self.controller.users[current_user]:
+            messagebox.showerror("Error", "You have no favourites to unfavourite.")
+            return
+
+        # Remove the album from favourites if it exists
+        if album["Deezer_ID"] in self.controller.users[current_user]["favourites"]:
+            self.controller.users[current_user]["favourites"].remove(album["Deezer_ID"])
+            self.controller.save_users()
+            messagebox.showinfo("Success", f"Album '{album['Album']}' has been removed from your favourites.")
+        else:
+            messagebox.showerror("Error", f"Album '{album['Album']}' is not in your favourites.")
     
     def add_album(self):
         print(f"DEBUG: add_album called. Login check result: {check_login()}")
