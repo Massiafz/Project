@@ -1,13 +1,13 @@
 # Comprehensive Test Documentation for BrightByte Music Cataloging Software
 
 ## Overview
-This document provides a detailed explanation of the comprehensive test suite for the BrightByte Music Cataloging Software. The suite is engineered to cover every feature and functionality—from file I/O and UI event handling to user authentication and album management—ensuring the application’s robustness.
+This document provides a detailed explanation of the comprehensive test suite for the BrightByte Music Cataloging Software. The suite is engineered to cover every feature and functionality—from file I/O and UI event handling to user authentication, album management, and now the favourites functionality—ensuring the application’s robustness.
 
 ## Test Suite Structure
 The tests are organized into three main categories:
 - **Clear Box Tests (CB):** Focus on low-level functions and file operations.
 - **Translucent Box Tests (TB):** Simulate direct user interactions (login, sign-up, album addition).
-- **Opaque Box Tests (OB):** Cover complete workflows and advanced scenarios (editing, deleting, searching, and error handling).
+- **Opaque Box Tests (OB):** Cover complete workflows and advanced scenarios (editing, deleting, searching, error handling, and favourites).
 
 ## Detailed Test Descriptions
 
@@ -54,7 +54,6 @@ The tests are organized into three main categories:
   *Purpose:* Simulate updating user account details with valid input.  
   *Expected Result:* The user's credentials are updated in the system.
 
-### Additional Comprehensive Tests
 - **test_logout_functionality:**  
   *Purpose:* Ensure that logout resets the user state and hides relevant UI elements (like the search bar).  
   *Expected Result:* `current_user` becomes `None` and UI components are hidden.
@@ -107,14 +106,13 @@ The tests are organized into three main categories:
   *Purpose:* Check that choosing to continue as a guest sets the current user to "Guest" and disables editing.  
   *Expected Result:* `current_user` is "Guest" and editing is not permitted.
 
-- **test_save_albums_file_write:**  
-  *Purpose:* Confirm that the album catalog is written correctly to the CSV file after modifications.  
-  *Expected Result:* The CSV file contains the updated album data.
+- **test_favourites_no_favourites:**  
+  *Purpose:* Verify that if a user with no favourites invokes the favourites function, an error message is shown and no albums are displayed.  
+  *Expected Result:* An error message ("No Results", "No favourites yet.") is shown and `search_results` remains empty.
 
-- **test_save_users_file_write:**  
-  *Purpose:* Verify that user data is correctly written to the JSON file upon saving.  
-  *Expected Result:* The JSON file contains the new/updated user information.
+- **test_favourites_with_favourites:**  
+  *Purpose:* Verify that when a user has favourite album IDs set, the favourites function correctly filters the album catalog to display only those albums.  
+  *Expected Result:* The search results list contains only the albums whose "Deezer_ID" matches the user's favourites.
 
 ## Conclusion
-Every function—from file I/O and multi-threading to user interface events and edge-case error handling—is thoroughly tested. The comprehensive documentation and inline comments serve to clarify the purpose and expected behavior of each test, ensuring that all aspects of the BrightByte Music Cataloging Software are robustly verified.
-
+Every function—from file I/O and multi-threading to UI events, user authentication, album management, and now the favourites functionality—is thoroughly tested. The comprehensive documentation and inline comments serve to clarify the purpose and expected behavior of each test, ensuring that all aspects of the BrightByte Music Cataloging Software are robustly verified.
