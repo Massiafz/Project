@@ -114,5 +114,13 @@ The tests are organized into three main categories:
   *Purpose:* Verify that when a user has favourite album IDs set, the favourites function correctly filters the album catalog to display only those albums.  
   *Expected Result:* The search results list contains only the albums whose "Deezer_ID" matches the user's favourites.
 
+- **test_unfavourite_album_success:**  
+  *Purpose:* Verify that `unfavourite_album` successfully removes a favourite album from a logged-in user's favourites list.  
+  *Expected Result:* The album’s `Deezer_ID` is removed from the user's favourites, and a success message is displayed.
+
+- **test_unfavourite_album_not_in_favourites:**  
+  *Purpose:* Verify that attempting to unfavourite an album that is not in the user's favourites list results in an error message.  
+  *Expected Result:* An error message is shown indicating that the album is not in the favourites list, with no change to the user's favourites.
+
 ## Conclusion
 Every function—from file I/O and multi-threading to UI events, user authentication, album management, and the favourites functionality—is thoroughly tested. The comprehensive documentation and inline comments serve to clarify the purpose and expected behavior of each test, ensuring that all aspects of the BrightByte Music Cataloging Software are robustly verified.
