@@ -755,14 +755,9 @@ Once you’ve added albums, you can view the entire catalog in a table or grid l
 ---
 
 ## ⚙️ 3. Settings & Configuration
-
-### 💾 Data Backup & Import/Export
-To ensure data is safely stored, users can export their catalog to a CSV file. This allows you to back up the data or share it with others.
-
-#### How to Export Data:
-1. Go to the **“Settings”** menu.
-2. Select the **“Export Data”** option.
-3. Choose the file format (e.g., CSV) and save the file to your desired location.
+- You are able to change your account information
+- Change username
+- Change password
 
 ---
 
@@ -857,8 +852,14 @@ This launches the BrightByte Music Cataloging Software and opens the main window
 - Click the "Unfavourite" button
 - If the changes don't happen instantly, you have to press the "refresh" button and go back to your favourites to finalize the CSV
 
+### 3.8 Delete Album
+- Select any album
+- Click the "delete" button below
 
-
+### 3.9 Edit Account
+- Click th "Edit Account" button below
+- Enter the credentials needed, so new username, original password, new password, confirm new password
+- Finally, click the "Update Account" button
 
 ## 4. Troubleshooting
 - **Application Doesn’t Open:** Ensure dependencies are installed and Python is correctly set up.
@@ -867,7 +868,7 @@ This launches the BrightByte Music Cataloging Software and opens the main window
 
 ## 5. Logging Out and Exiting
 - Click "Log Out" in the navigation bar to log out.
-- Close the window or use a keyboard shortcut (e.g., Alt+F4 on Windows) to exit.
+- Close the window by clicking the "X" in the window bar. 
 
 ## 6. Conclusion
 Now that you've set up and learned to use BrightByte Music Cataloging Software, you can easily manage your album collection. If you need assistance, refer to the troubleshooting section or contact support.
@@ -901,14 +902,8 @@ Tip: If you’ve just added an album, refresh the catalog to view the new entry.
 Solution: Go to the Catalog page and click the Add Album button. Fill out the form with album details, such as Album Name, Artist Name, and Release Date. Click Save once done.
 
 ### 5. How do I edit or delete an album from the catalog?
-Solution: On the Catalog page, find the album you want to modify. Click the Edit button to update the album’s information or click Delete to remove it from the catalog. A confirmation will appear before deletion.
+Solution: On the Catalog page, find the album you want to modify. Click the Edit button to update the album’s information or click Delete to remove it from the catalog. A confirmation will appear before deletion. Also, if it still does not work click the "refresh" button this will ensure that your additons and deletions are accomodated for. 
 
-
-### 7. My CSV file import didn’t work. What should I check?
-Solution: Ensure the CSV file is formatted correctly, with the necessary columns like Album Name, Artist Name, Release Date, etc. If the file structure doesn’t match the application’s expectations, the import may fail.
-
-### 8. I get an error when exporting data. What can I do?
-Solution: Check if the file you’re exporting to is open in another application (like Excel). Close the file and try exporting again.
 
 # Tooltips and Inline Help
 ## Search Bar
