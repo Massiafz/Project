@@ -4,7 +4,7 @@
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
+    binaries=[('/lib/x86_64-linux-gnu/libpython3.12.so.1.0', '.')],
     datas=[('users.json', '.'), ('cleaned_music_data.csv', '.'), ('BrightByteLogo.png', '.'), ('Eric.png', '.')],
     hiddenimports=['PIL._tkinter_finder'],
     hookspath=[],
@@ -35,10 +35,4 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-)
-app = BUNDLE(
-    exe,
-    name='main.app',
-    icon=None,
-    bundle_identifier=None,
 )

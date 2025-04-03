@@ -633,6 +633,71 @@ class TestAlbumCatalogApp(unittest.TestCase):
         self.app.favourites()
         self.assertEqual(len(self.app.search_results), 1, "Search results should contain one favourite album")
         self.assertEqual(self.app.search_results[0]["Deezer_ID"], "fav123", "The favourite album's Deezer_ID should match")
+    def test_unfavourite_album_success(self):
+        """
+        OB Test 26: Verify that unfavourite_album successfully removes a favourite album.
+        """
+        self.app.current_user = "faveuser"
+        main.current_user = "faveuser"
+        main.is_logged_in = True
+        favourite_id = "fav123"
+        # Set up the user with a favourite album.
+        self.app.users["faveuser"] = {"favourites": [favourite_id]}
+        # Create an album with the given Deezer_ID.
+        album = {
+            "Ranking": "1",
+            "Album": "Fav Album",
+            "Artist Name": "Fav Artist",
+            "Release Date": "2021-01-01",
+            "Genres": "Pop",
+            "Average Rating": "5",
+            "Number of Ratings": "100",
+            "Number of Reviews": "50",
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": favourite_id
+        }
+        self.app.albums = [album]
+        catalog_frame = self.app.frames["CatalogFrame"]
+        catalog_frame.refresh_album_list()
+        # Simulate selecting the album.
+        catalog_frame.selected_album = catalog_frame.album_items[0]
+        with patch("main.messagebox.showinfo") as mock_showinfo:
+            catalog_frame.unfavourite_album()
+            mock_showinfo.assert_called_once_with("Success", f"Album '{album['Album']}' has been removed from your favourites.")
+        self.assertNotIn(favourite_id, self.app.users["faveuser"].get("favourites", []))
+
+    def test_unfavourite_album_not_in_favourites(self):
+        """
+        OB Test 27: Verify that unfavourite_album shows an error when the album is not in favourites.
+        """
+        self.app.current_user = "faveuser"
+        main.current_user = "faveuser"
+        main.is_logged_in = True
+        # Set up the user with no favourites.
+        self.app.users["faveuser"] = {"favourites": []}
+        album = {
+            "Ranking": "1",
+            "Album": "Non-Fav Album",
+            "Artist Name": "Artist",
+            "Release Date": "2021-01-01",
+            "Genres": "Pop",
+            "Average Rating": "5",
+            "Number of Ratings": "100",
+            "Number of Reviews": "50",
+            "Cover URL": "",
+            "Tracklist": "",
+            "Deezer_ID": "nonfav123"
+        }
+        self.app.albums = [album]
+        catalog_frame = self.app.frames["CatalogFrame"]
+        catalog_frame.refresh_album_list()
+        # Simulate selecting the album.
+        catalog_frame.selected_album = catalog_frame.album_items[0]
+        with patch("main.messagebox.showerror") as mock_showerror:
+            catalog_frame.unfavourite_album()
+            mock_showerror.assert_called_once_with("Error", f"Album '{album['Album']}' is not in your favourites.")
+
 
 if __name__ == '__main__':
     unittest.main()
