@@ -542,6 +542,14 @@ Or explicitly using Python 3:
 ```sh
 python3 main.py
 ```
+Or run the build file (windows): 
+```
+./build.bat
+```
+Or run the build file (linux): 
+```
+build.sh
+```
 
 ### 2️⃣ Running Data Processing & Analysis *(If applicable)*
 If data processing is included, run:
