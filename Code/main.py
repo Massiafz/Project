@@ -680,9 +680,8 @@ class CatalogFrame(tk.Frame):
             messagebox.showerror("Error", "You must be logged in to add an album")
             return
         
-        add_win = tk.Toplevel(self)
+        add_win = tk.Toplevel(self, bg=PRIMARY_BACKGROUND_COLOUR)
         add_win.title("Add Album")
-        add_win.configure(background="#f0f0f0")
         add_win.grab_set()
         
         ttk.Label(add_win, text="Artist Name:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
@@ -720,13 +719,50 @@ class CatalogFrame(tk.Frame):
         album_image_entry.grid(row=4, column=2, padx=5, pady=5)
         file_label = tk.Label(add_win, text="No file selected.")
         file_label.grid(row=4, column=3, padx=5, pady=5)
-        
+
+        ttk.Label(add_win, text="Tracks:").grid(row=5, column=0, padx=5, pady=5, sticky="e")
+        tracks_list = tk.Listbox(add_win)
+        tracks_list.grid(row=5, column=1, padx=5, pady=5)
+
+        def add_track() -> None:
+            if tracks_list_add_entry.get() != "":
+                track_name = tracks_list_add_entry.get()
+                tracks_list.insert(tk.END, f"{tracks_list.size() + 1}. {track_name}")
+                tracks_list_add_entry.delete(0, tk.END)
+
+        def delete_track() -> None:
+            if len(tracks_list.curselection()) == 1:
+                indexToDelete = tracks_list.curselection()[0]
+                newIndexedTracks = []
+                i = indexToDelete + 1
+                for track_string in tracks_list.get(indexToDelete + 1, tk.END):
+                    if len(track_string.split('. ')) > 1:
+                        newIndexedTracks.append(f"{i}. {track_string.split('. ')[1]}")
+                        i += 1
+                
+                tracks_list.delete(indexToDelete, tk.END)
+
+                for track_string in newIndexedTracks:
+                    tracks_list.insert(tk.END, track_string)
+
+        tracks_list_delete_button = ttk.Button(add_win, text="Delete Selected Track", command=delete_track)
+        tracks_list_delete_button.grid(row=5, column=2, padx=5, pady=5)
+        tracks_list_add_entry = ttk.Entry(add_win)
+        tracks_list_add_entry.grid(row=5, column=3, padx=5, pady=5)
+        tracks_list_add_button = ttk.Button(add_win, text="Add Track", command=add_track)
+        tracks_list_add_button.grid(row=5, column=4, padx=5, pady=5)
+
         def save_album():
             artist = artist_entry.get().strip()
             album_name = album_entry.get().strip()
             release_date = release_entry.get().strip()
             genres = genres_entry.get().strip()
             cover_url = album_url_entry.get().strip()
+            track_list_string = ""
+
+            for track_string in tracks_list.get(0, tk.END):
+                track_list_string = track_list_string + track_string + "; "
+
             if self.current_file_path != "":
                 cover_url = self.current_file_path
             if not artist or not album_name or not release_date:
@@ -742,7 +778,7 @@ class CatalogFrame(tk.Frame):
                 "Number of Ratings": 0,
                 "Number of Reviews": 0,
                 "Cover URL": cover_url,
-                "Tracklist": "",
+                "Tracklist": track_list_string,
                 "Deezer_ID" : ""
             }
             self.controller.albums.append(new_album)
@@ -750,7 +786,7 @@ class CatalogFrame(tk.Frame):
             self.refresh_album_list()
             add_win.destroy()
         
-        ttk.Button(add_win, text="Save Album", command=save_album).grid(row=5, column=0, columnspan=2, pady=10)
+        ttk.Button(add_win, text="Save Album", command=save_album).grid(row=6, column=0, columnspan=2, pady=10)
     
     def edit_album(self, force=False):
         print(f"DEBUG: edit_album called. Login check result: {check_login()}")
@@ -766,9 +802,8 @@ class CatalogFrame(tk.Frame):
         index = self.album_items.index(self.selected_album)
         album = self.controller.albums[index]
         
-        edit_win = tk.Toplevel(self)
+        edit_win = tk.Toplevel(self, bg=PRIMARY_BACKGROUND_COLOUR)
         edit_win.title("Edit Album")
-        edit_win.configure(background="#f0f0f0")
         edit_win.grab_set()
         
         ttk.Label(edit_win, text="Artist Name:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
@@ -816,6 +851,42 @@ class CatalogFrame(tk.Frame):
         elif album.get("Cover URL", "") != "" and album.get("Cover URL", "") is not None:
             self.current_file_path = album.get("Cover URL", "")
             file_label.config(text=f"Selected file: {self.current_file_path}")
+
+        ttk.Label(edit_win, text="Tracks:").grid(row=5, column=0, padx=5, pady=5, sticky="e")
+        tracks_list = tk.Listbox(edit_win)
+        tracks_list.grid(row=5, column=1, padx=5, pady=5)
+
+        for track_string in album.get("Tracklist").split(";"):
+            if track_string.strip() != "":
+                tracks_list.insert(tk.END, track_string)
+
+        def add_track() -> None:
+            if tracks_list_add_entry.get() != "":
+                track_name = tracks_list_add_entry.get()
+                tracks_list.insert(tk.END, f"{tracks_list.size() + 1}. {track_name}")
+                tracks_list_add_entry.delete(0, tk.END)
+
+        def delete_track() -> None:
+            if len(tracks_list.curselection()) == 1:
+                indexToDelete = tracks_list.curselection()[0]
+                newIndexedTracks = []
+                i = indexToDelete + 1
+                for track_string in tracks_list.get(indexToDelete + 1, tk.END):
+                    if len(track_string.split('. ')) > 1:
+                        newIndexedTracks.append(f"{i}. {track_string.split('. ')[1]}")
+                        i += 1
+                
+                tracks_list.delete(indexToDelete, tk.END)
+
+                for track_string in newIndexedTracks:
+                    tracks_list.insert(tk.END, track_string)
+
+        tracks_list_delete_button = ttk.Button(edit_win, text="Delete Selected Track", command=delete_track)
+        tracks_list_delete_button.grid(row=5, column=2, padx=5, pady=5)
+        tracks_list_add_entry = ttk.Entry(edit_win)
+        tracks_list_add_entry.grid(row=5, column=3, padx=5, pady=5)
+        tracks_list_add_button = ttk.Button(edit_win, text="Add Track", command=add_track)
+        tracks_list_add_button.grid(row=5, column=4, padx=5, pady=5)
         
         def update_album():
             updated_artist = artist_entry.get().strip()
@@ -823,6 +894,11 @@ class CatalogFrame(tk.Frame):
             updated_release = release_entry.get().strip()
             updated_genres = genres_entry.get().strip()
             cover_url = album_url_entry.get().strip()
+            track_list_string = ""
+
+            for track_string in tracks_list.get(0, tk.END):
+                track_list_string = track_list_string + track_string + "; "
+
             if self.current_file_path != "":
                 cover_url = self.current_file_path
             if not updated_artist or not updated_album or not updated_release:
@@ -837,13 +913,15 @@ class CatalogFrame(tk.Frame):
                 "Average Rating": album["Average Rating"],
                 "Number of Ratings": album["Number of Ratings"],
                 "Number of Reviews": album["Number of Reviews"],
-                "Cover URL": cover_url
+                "Cover URL": cover_url,
+                "Tracklist": track_list_string,
+                "Deezer_ID" : ""
             }
             self.controller.save_albums()
             self.refresh_album_list()
             edit_win.destroy()
         
-        ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=5, column=0, columnspan=2, pady=10)
+        ttk.Button(edit_win, text="Update Album", command=update_album).grid(row=6, column=0, columnspan=2, pady=10)
     
     def delete_album(self, force=False):
         print(f"DEBUG: delete_album called. Login check result: {check_login()}")
