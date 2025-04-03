@@ -865,7 +865,12 @@ This launches the BrightByte Music Cataloging Software and opens the main window
 - The "Refresh" button is used when there are issues going in within the album cataloging system to refresh the system
 - You use it when add album, delete album, edit album, or favourite album does not instantly change the CSV
 - For example, if you add an album and you scroll to the bottom but you do not see it, then you press the "refresh" button, scroll down, and now its there
-- Also it is our "back" button, so if you are in the favourites section and you want to go back to the album catalog then you can just press "refresh" button and it will take you back to the album catalog. 
+- Also it is our "back" button, so if you are in the favourites section and you want to go back to the album catalog then you can just press "refresh" button and it will take you back to the album catalog.
+
+### Access Rights: 
+- Only people who have an account "Signed Up" can use the features
+- Guests are able to view the catalog but not view features such as add album, edit album, favourite, unfavourite, etc
+- However they can log out of the system and create their own account
 
 ## 4. Troubleshooting
 - **Application Doesn’t Open:** Ensure dependencies are installed and Python is correctly set up.
