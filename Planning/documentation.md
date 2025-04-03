@@ -843,15 +843,22 @@ This launches the BrightByte Music Cataloging Software and opens the main window
   - Click "Edit" to modify album details, then "Save."
   - Click "Delete" to remove an album (confirmation required).
 
-### 3.5 Exporting and Importing Data
-- **Export Data:**
-  1. Go to "Settings."
-  2. Click "Export Data."
-  3. Choose a format (e.g., CSV) and save the file.
-- **Import Data:**
-  1. Go to "Settings."
-  2. Click "Import Data."
-  3. Upload a properly formatted CSV file.
+### 3.5 View Tracks
+- Click on an album
+- Press the tracks button at the bottom to view the tracks
+
+### 3.6 Favourite an Album/View Favourites
+- Select any album
+- Press the favourite button to add that album to your favourites
+- To view your favourites click the "Favourites" button
+
+### 3.7 Unfavourite
+- Click on an album in your favourites section or in the catalog
+- Click the "Unfavourite" button
+- If the changes don't happen instantly, you have to press the "refresh" button and go back to your favourites to finalize the CSV
+
+
+
 
 ## 4. Troubleshooting
 - **Application Doesn’t Open:** Ensure dependencies are installed and Python is correctly set up.
