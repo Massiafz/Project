@@ -861,6 +861,12 @@ This launches the BrightByte Music Cataloging Software and opens the main window
 - Enter the credentials needed, so new username, original password, new password, confirm new password
 - Finally, click the "Update Account" button
 
+### Refresh Button: 
+- The "Refresh" button is used when there are issues going in within the album cataloging system to refresh the system
+- You use it when add album, delete album, edit album, or favourite album does not instantly change the CSV
+- For example, if you add an album and you scroll to the bottom but you do not see it, then you press the "refresh" button, scroll down, and now its there
+- Also it is our "back" button, so if you are in the favourites section and you want to go back to the album catalog then you can just press "refresh" button and it will take you back to the album catalog. 
+
 ## 4. Troubleshooting
 - **Application Doesn’t Open:** Ensure dependencies are installed and Python is correctly set up.
 - **Search Results Are Empty:** Check the query and filters. Ensure the album exists in the catalog.
