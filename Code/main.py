@@ -564,7 +564,7 @@ class CatalogFrame(tk.Frame):
         for widget in [albumItem, labelFrame, albumNameLabel, artistNameLabel, genresLabel, releaseDateLabel, coverLabel]:
             widget.bind("<Button-1>", lambda event, item=albumItem: self.select_album(event, item))
     
-    def refresh_album_list(self):
+    def refresh_album_list(self, no_threading = False):
         # Clear existing album items.
         for existingAlbumItem in self.album_items:
             if existingAlbumItem is not None:
@@ -582,6 +582,11 @@ class CatalogFrame(tk.Frame):
         # Use the thread pool executor to limit concurrent threads.
         self.refresh_album_threads = []
         for index, album in enumerate(album_arr_to_use):
+            if no_threading:
+                self.thread_function_refresh_albums(index, album, currentRow)
+                currentRow += 1
+                continue
+            
             future = self.executor.submit(self.thread_function_refresh_albums, index, album, currentRow)
             self.refresh_album_threads.append(future)
             currentRow += 1

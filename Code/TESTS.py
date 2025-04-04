@@ -659,7 +659,7 @@ class TestAlbumCatalogApp(unittest.TestCase):
         }
         self.app.albums = [album]
         catalog_frame = self.app.frames["CatalogFrame"]
-        catalog_frame.refresh_album_list()
+        catalog_frame.refresh_album_list(True)
         # Simulate selecting the album.
         catalog_frame.selected_album = catalog_frame.album_items[0]
         with patch("main.messagebox.showinfo") as mock_showinfo:
@@ -691,7 +691,7 @@ class TestAlbumCatalogApp(unittest.TestCase):
         }
         self.app.albums = [album]
         catalog_frame = self.app.frames["CatalogFrame"]
-        catalog_frame.refresh_album_list()
+        catalog_frame.refresh_album_list(True)
         # Simulate selecting the album.
         catalog_frame.selected_album = catalog_frame.album_items[0]
         with patch("main.messagebox.showerror") as mock_showerror:
