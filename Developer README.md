@@ -137,6 +137,3 @@ This class serves as the central controller of the application by extending `tk.
 
 This technical breakdown covers the structure and functionality of BrightByte Music Cataloging Software. The application is designed to be a self-contained solution for managing a music catalog, with emphasis on user interaction, data persistence, and responsive UI through asynchronous processing. Each module and function is carefully structured to support a robust and user-friendly experience.
 
-````markdown
-
-You can now save this content as a Markdown file (e.g., `Developer_README.md`) for a thorough technical reference of the code.
