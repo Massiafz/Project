@@ -55,6 +55,7 @@ def load_users():
 # Login function to authenticate a user.
 def login(username, password):
     global current_user, is_logged_in  # Declare modification of global variables.
+
     users = load_users()  # Load current users from the JSON file.
     
     for user in users:
@@ -385,6 +386,14 @@ class LoginFrame(tk.Frame):
             self.controller.search_button.pack(side="right", padx=10)
             self.controller.search_bar.pack(side="right")
             self.controller.filter_dropdown.pack(side="right", padx=10)
+
+            self.controller.frames["CatalogFrame"].edit_album_btn.grid(row=0, column=4, padx=5, pady=10)
+            self.controller.frames["CatalogFrame"].delete_btn.grid(row=0, column=5, padx=5, pady=10)
+            self.controller.frames["CatalogFrame"].add_btn.grid(row=0, column=3, padx=5, pady=10)
+            self.controller.frames["CatalogFrame"].favourite_btn.grid(row=0, column=1, padx=5, pady=10)
+            self.controller.frames["CatalogFrame"].unfavourite_btn.grid(row=0, column=2, padx=5, pady=10)
+            self.controller.frames["CatalogFrame"].edit_account_btn.grid(row=0, column=6, padx=5, pady=10)
+
             self.controller.frames["CatalogFrame"].refresh_button.grid()
             self.controller.show_frame("CatalogFrame")  # Switch to the catalog frame.
             # Clear the input fields.
@@ -406,6 +415,14 @@ class LoginFrame(tk.Frame):
         self.controller.search_button.pack(side="right", padx=10)
         self.controller.search_bar.pack(side="right")
         self.controller.filter_dropdown.pack(side="right", padx=10)
+
+        self.controller.frames["CatalogFrame"].edit_album_btn.grid_forget()
+        self.controller.frames["CatalogFrame"].delete_btn.grid_forget()
+        self.controller.frames["CatalogFrame"].add_btn.grid_forget()
+        self.controller.frames["CatalogFrame"].favourite_btn.grid_forget()
+        self.controller.frames["CatalogFrame"].unfavourite_btn.grid_forget()
+        self.controller.frames["CatalogFrame"].edit_account_btn.grid_forget()
+
         self.controller.frames["CatalogFrame"].refresh_button.grid()
         self.controller.show_frame("CatalogFrame")  # Switch to the catalog frame.
 
@@ -539,19 +556,20 @@ class CatalogFrame(tk.Frame):
         self.favourite_btn.grid(row=0, column=1, padx=5, pady=10)
         self.unfavourite_btn = ttk.Button(buttonFrame, text="Unfavourite Album", command=self.unfavourite_album)
         self.unfavourite_btn.grid(row=0, column=2, padx=5, pady=10)  # Button for unfavouriting albums.
-        add_btn = ttk.Button(buttonFrame, text="Add Album", command=self.add_album)
-        add_btn.grid(row=0, column=3, padx=5, pady=10)
-        edit_album_btn = ttk.Button(buttonFrame, text="Edit Album", command=self.edit_album)
-        edit_album_btn.grid(row=0, column=4, padx=5, pady=10)
-        delete_btn = ttk.Button(buttonFrame, text="Delete Album", command=self.delete_album)
-        delete_btn.grid(row=0, column=5, padx=5, pady=10)
-        edit_account_btn = ttk.Button(buttonFrame, text="Edit Account", command=self.edit_account)
-        edit_account_btn.grid(row=0, column=6, padx=5, pady=10)
+        self.add_btn = ttk.Button(buttonFrame, text="Add Album", command=self.add_album)
+        self.add_btn.grid(row=0, column=3, padx=5, pady=10)
+        self.edit_album_btn = ttk.Button(buttonFrame, text="Edit Album", command=self.edit_album)
+        self.edit_album_btn.grid(row=0, column=4, padx=5, pady=10)
+        self.delete_btn = ttk.Button(buttonFrame, text="Delete Album", command=self.delete_album)
+        self.delete_btn.grid(row=0, column=5, padx=5, pady=10)
+        self.edit_account_btn = ttk.Button(buttonFrame, text="Edit Account", command=self.edit_account)
+        self.edit_account_btn.grid(row=0, column=6, padx=5, pady=10)
         logout_btn = ttk.Button(buttonFrame, text="Logout", command=self.logout)
         logout_btn.grid(row=0, column=7, padx=5, pady=10)
         self.refresh_button = ttk.Button(buttonFrame, text="Refresh", command=self.controller.refresh_catalog)
         self.refresh_button.grid(row=0, column=8, padx=5, pady=10)
         self.refresh_button.grid_remove()  # Hide the refresh button initially.
+
     
     def thread_function_refresh_albums(self, index, album, currentRow):
         """Thread function to load and display a single album item."""

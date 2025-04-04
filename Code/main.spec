@@ -4,7 +4,7 @@
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[('/lib/x86_64-linux-gnu/libpython3.12.so.1.0', '.')],
+    binaries=[],
     datas=[('users.json', '.'), ('cleaned_music_data.csv', '.'), ('BrightByteLogo.png', '.'), ('Eric.png', '.')],
     hiddenimports=['PIL._tkinter_finder'],
     hookspath=[],
