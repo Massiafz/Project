@@ -4,6 +4,13 @@
 
 BrightByte Music Cataloging Software is a Python desktop application built using Tkinter. It provides a comprehensive GUI for managing a music album catalog, including user authentication, album management (adding, editing, deleting), search/filter functionality, and asynchronous image loading. This document offers a detailed technical breakdown of the code, its architecture, and the main components.
 
+### Developed By BrightByte:
+- **Project Manager:** Bach Nguyen (100926453)
+- **Technical Manager:** Massi Afzal (100911029)
+- **Software Quality Lead:** Moksh Patel (100916422)
+- **Back-End Lead:** Jason Guan (100927182)
+- **Front-End Lead:** Vincent Tseng (100912590)
+
 ## Project Structure
 
 - **/Project/code/main.py**  
