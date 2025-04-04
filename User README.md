@@ -85,5 +85,4 @@ cd Project/code
 
 ## Contact & Support
 
-For further assistance or to report bugs, please visit the GitHub repository’s Issues section:  
-[https://github.com/Massiafz/Project.git](https://github.com/Massiafz/Project.git)
+For further assistance or to report bugs, please contact the Technical Manager: massi.afzal@ontariotechu.net
