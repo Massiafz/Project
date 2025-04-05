@@ -31,7 +31,7 @@ cd Project/code
   ./build.bat
   ```
 
-  ### Step 4: Run the Executable
+### Step 4: Run the Executable
 
 - **For Mac/Linux Users:**
   ```bash
