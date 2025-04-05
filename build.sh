@@ -55,5 +55,7 @@ pyinstaller --onefile --distpath . --name brightbyte-linux --windowed \
     $ADD_BINARY_FLAG \
     ./Code/main.py
 
+chmod +x brightbyte-linux
+
 echo "Build complete! Launching the application..."
 ./brightbyte-linux
