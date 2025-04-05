@@ -46,7 +46,7 @@ fi
 
 # Run PyInstaller with the required options.
 # The --hidden-import flag is added to include PIL._tkinter_finder, which is needed for ImageTk.
-pyinstaller --onefile --distpath . --name brightbyte-linux --windowed \
+pyinstaller --onefile --distpath . --name brightbyte-linux_mac --windowed \
     --hidden-import PIL._tkinter_finder \
     --add-data "./Code/users.json${SEP}." \
     --add-data "./Code/cleaned_music_data.csv${SEP}." \
@@ -55,7 +55,7 @@ pyinstaller --onefile --distpath . --name brightbyte-linux --windowed \
     $ADD_BINARY_FLAG \
     ./Code/main.py
 
-chmod +x brightbyte-linux
+chmod +x brightbyte-linux_mac
 
 echo "Build complete! Launching the application..."
-./brightbyte-linux
+./brightbyte-linux_mac
