@@ -17,7 +17,7 @@ git clone https://github.com/Massiafz/Project.git
 
 Change your directory to where the application code is located:
 ```bash
-cd Project/code
+cd Project
 ```
 
 ### Step 3: Run the Executable
