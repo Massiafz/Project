@@ -55,7 +55,7 @@ pyinstaller --onefile --distpath . --specpath ./spec --name brightbyte-mac --win
     $ADD_BINARY_FLAG \
     ./Code/main.py
 
-chmod +x brightbyte-mac
+chmod u+x brightbyte-mac
 
 echo "Build complete! Launching the application..."
 ./brightbyte-mac
