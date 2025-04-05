@@ -27,23 +27,34 @@ Once they are logged in, they will be able to access the main cataloging feature
 ## ❓ Instructions To Run ❓
 To retrieve the program, first ensure git is installed on the computer you are using, then clone this GitHub repository inside a terminal with the command below:
 
-```
+### Step 1: Clone the Repository
+
+Open your terminal or command prompt and run the following command:
+```bash
 git clone https://github.com/Massiafz/Project.git
 ```
 
-After you have git cloned the repository, you want to change directory into "Code":
-```
-cd .\Code
-```
+### Step 2: Navigate to the Code Directory
 
-Then, navigate to the [`main.py`](main.py) file within the folder you cloned the repository into. Next, either click the "run" button in your IDE or enter the following command in the terminal:
-
-```
-python .\main.py
+Change your directory to where the application code is located:
+```bash
+cd Project
 ```
 
+### Step 3: Run the Executable
 
-After doing this, the program will run and show up on your screen.
+- **For Mac/Linux Users:**
+  ```bash
+  ./brightbyte-linux
+  ```
+- **For Windows Users:**
+  ```batch
+  ./brightbyte-windows
+  ```
+  Windows and Linux are able to run the executable from the file explorer but mac is not able to.
+
+*These scripts will set up and launch the application on your system.*
+
 
 
 ## 👟 Iterations 👟

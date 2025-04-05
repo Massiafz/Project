@@ -140,6 +140,17 @@ This class serves as the central controller of the application by extending `tk.
 - **Image Caching:**  
   A cache is maintained to store loaded images, reducing redundant network requests and image processing operations on subsequent accesses.
 
+### Build Files: 
+
+For Mac and Linux: 
+```
+./build.sh
+```
+For Windows: 
+```
+./build.bat
+```
+
 ## Conclusion
 
 This technical breakdown covers the structure and functionality of BrightByte Music Cataloging Software. The application is designed to be a self-contained solution for managing a music catalog, with emphasis on user interaction, data persistence, and responsive UI through asynchronous processing. Each module and function is carefully structured to support a robust and user-friendly experience.

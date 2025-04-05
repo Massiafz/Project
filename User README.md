@@ -17,19 +17,20 @@ git clone https://github.com/Massiafz/Project.git
 
 Change your directory to where the application code is located:
 ```bash
-cd Project/code
+cd Project
 ```
 
-### Step 3: Build and Run the Application
+### Step 3: Run the Executable
 
 - **For Mac/Linux Users:**
   ```bash
-  ./build.sh
+  ./brightbyte-linux
   ```
 - **For Windows Users:**
   ```batch
-  ./build.bat
+  ./brightbyte-windows
   ```
+  Windows and Linux are able to run the executable from the file explorer but mac is not able to.
 
 *These scripts will set up and launch the application on your system.*
 
