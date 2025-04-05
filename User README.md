@@ -31,6 +31,17 @@ cd Project/code
   ./build.bat
   ```
 
+  ### Step 4: Run the Executable
+
+- **For Mac/Linux Users:**
+  ```bash
+  ./brightbyte-linux
+  ```
+- **For Windows Users:**
+  ```batch
+  ./brightbyte-windows.exe
+  ```
+
 *These scripts will set up and launch the application on your system.*
 
 ## Features
