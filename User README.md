@@ -68,6 +68,7 @@ cd Project
 - [Edit, Add, Delete Albums & Edit Account](https://youtu.be/wjz4acvXSR8)
 - [Favourite & Unfavourite Albums](https://youtu.be/b2SkPcyBFnI)
 
+*You can watch these videos at 1.25 or 1.5 speed.*
 
 ## User Interface Overview
 
