@@ -20,18 +20,7 @@ Change your directory to where the application code is located:
 cd Project/code
 ```
 
-### Step 3: Build and Run the Application
-
-- **For Mac/Linux Users:**
-  ```bash
-  ./build.sh
-  ```
-- **For Windows Users:**
-  ```batch
-  ./build.bat
-  ```
-
-### Step 4: Run the Executable
+### Step 3: Run the Executable
 
 - **For Mac/Linux Users:**
   ```bash
@@ -41,6 +30,7 @@ cd Project/code
   ```batch
   ./brightbyte-windows.exe
   ```
+  Windows and Linux are able to run the executable from the file explorer but mac is not able to.
 
 *These scripts will set up and launch the application on your system.*
 
