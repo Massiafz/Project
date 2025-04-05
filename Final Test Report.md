@@ -45,5 +45,29 @@
 | OB-25   | Displaying favourite albums                                     | User `"faveuser"` has favourites list containing `"fav123"` and album list includes both favourite and non-favourite albums | Invoke `favourites()` function.                                                                                                                                                                                                                                  | Only the album with Deezer\_ID `"fav123"` is displayed in search results.                         | Massi       |
 | OB-26   | Removing an album from favourites                               | User `"faveuser"` has album with Deezer\_ID `"fav123"` in favourites           | 1. Select the album in CatalogFrame. <br> 2. Invoke `unfavourite_album()`.                                                                                                                                                                                      | Album is removed from favourites and a success message is shown.                                   | Massi       |
 | OB-27   | Attempting to remove an album not in favourites                 | User `"faveuser"` exists with an empty favourites list                      | 1. Select a non-favourite album in CatalogFrame. <br> 2. Invoke `unfavourite_album()`.                                                                                                                                                                          | Error is displayed indicating the album is not in favourites.                                     | Massi       |
+
+---
+
+## 3. Bugs Fixed 🐛
+
+During this entire project, we faced a bunch of bugs during development. Below are some of the ones we fixed:
+
+**1. Album Adding/Deletion Causing Tracklist Errors:**
+
+- After adding new columns/attributes (`Tracklist` and `Deezer_ID`) to the csv database, we forgot to add them to our save function (named `save_albums()`). This function is called after every album add and album deletion so it is quite important. As a result, the data was overwritten causing the tracklist to get deleted. To fix this, we just wrote the additional attributes back in the save function.
+
+**2. Edit Album Popup Window Test Failure:**
+
+- While doing our unit tests, the popup windows caused edit album test failures due to them stalling the main thread while the tests kept going ahead. To fix this, we added a `force` boolean argument to the `edit_album()` function. If this boolean is True, then the function will skip these popup windows and just accept the edits. This was okay for some of our unit tests since we were testing as if the user did press the accept popup button anyways.
+
+**3. Favourite/Unfavourite Album Test Failure:**
+
+- The `favourite_album()` and `unfavourite_album()` functions were failing their unit tests because the threading of our album display caused the `selected_album` of the catalog class to not register in time before the testing occured. To fix this, we created a `no_threading` boolean argument to our refresh function which just forces the album to load on the main thread. This is fine in this case since we were just using one album in these two unit tests anyways.
+
+**4. Guest Login Kept Showing Extra Buttons Error:**
+
+- We were designing the UI so that the `Edit Album`, `Add Album`, `Delete Album`, `Favourite Album`, `Unfavourite Album`, and `Edit Account` buttons didn't appear for guests. However, they still showed up even though we used `grid_forget()` to hide them. This was because we called `grid_forget()` in the `__init__()` function (which is only called once at the very start of the executable). So, by moving these `grid_forget()` calls to the `continue_as_guest()` function, it allowed them to actually register.
+
+
 ````markdown
 
