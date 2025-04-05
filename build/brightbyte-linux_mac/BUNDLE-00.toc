@@ -1,4 +1,0 @@
-([('brightbyte-linux_mac',
-   '/Users/Bach/Documents/OTU WINTER 2025/Software '
-   'Design/project/Project/brightbyte-linux_mac',
-   'EXECUTABLE')],)
