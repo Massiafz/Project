@@ -47,4 +47,3 @@
 | OB-27   | Attempting to remove an album not in favourites                 | User `"faveuser"` exists with an empty favourites list                      | 1. Select a non-favourite album in CatalogFrame. <br> 2. Invoke `unfavourite_album()`.                                                                                                                                                                          | Error is displayed indicating the album is not in favourites.                                     | Massi       |
 ````markdown
 
-Feel free to adjust further if needed!
