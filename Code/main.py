@@ -18,8 +18,8 @@ from concurrent.futures import ThreadPoolExecutor  # For managing a pool of thre
 # ---------------------------------------------------------------------------
 # Define constants for file paths and theme colours
 # ---------------------------------------------------------------------------
-USERS_JSON = "users.json"               # File path for storing user login data in JSON format.
-ALBUMS_CSV = "cleaned_music_data.csv"       # File path for storing album catalog data in CSV format.
+USERS_JSON = "./Code/users.json"               # File path for storing user login data in JSON format.
+ALBUMS_CSV = "./Code/cleaned_music_data.csv"       # File path for storing album catalog data in CSV format.
 
 # UI colour constants.
 PRIMARY_BACKGROUND_COLOUR = "#527cc5"       # Primary background colour used across the UI.
@@ -41,13 +41,13 @@ is_logged_in = False  # Boolean flag to indicate whether a user is logged in.
 # Function to load users from JSON.
 def load_users():
     # Check if the users JSON file exists.
-    if os.path.exists('users.json'):
-        with open('users.json', 'r') as file:
+    if os.path.exists('./Code/users.json'):
+        with open('./Code/users.json', 'r') as file:
             # Load and return user data from the JSON file.
             return json.load(file)
     else:
         # Create an empty users file if it doesn't exist.
-        with open('users.json', 'w') as file:
+        with open('./Code/users.json', 'w') as file:
             json.dump([], file)
         # Return an empty list indicating no users.
         return []
@@ -103,8 +103,8 @@ class AlbumCatalogApp(tk.Tk):
         
         # Load and set the window icon.
         # If "BrightByteLogo.png" exists, load it; otherwise, create a fallback dummy image.
-        if os.path.exists("BrightByteLogo.png"):
-            image = Image.open("BrightByteLogo.png")
+        if os.path.exists("./Code/BrightByteLogo.png"):
+            image = Image.open("./Code/BrightByteLogo.png")
         else:
             # Create a plain gray dummy image for testing or fallback purposes.
             image = Image.new("RGB", (1080, 1080), color=(200, 200, 200))
@@ -606,7 +606,7 @@ class CatalogFrame(tk.Frame):
                     print(f"Failed to load album cover for {albumURL}: {e}")  # Log error.
                     albumCover = self.album_cover_cache.get("default")
                     if albumCover is None:
-                        default_img = Image.open("Eric.png")
+                        default_img = Image.open("./Code/Eric.png")
                         default_img = default_img.resize((150,150), Image.LANCZOS)
                         albumCover = ImageTk.PhotoImage(default_img)
                         self.album_cover_cache["default"] = albumCover  # Cache the default image.
@@ -614,7 +614,7 @@ class CatalogFrame(tk.Frame):
             # Use default image if no album URL is provided.
             albumCover = self.album_cover_cache.get("default")
             if albumCover is None:
-                default_img = Image.open("Eric.png")
+                default_img = Image.open("./Code/Eric.png")
                 default_img = default_img.resize((150,150), Image.LANCZOS)
                 albumCover = ImageTk.PhotoImage(default_img)
                 self.album_cover_cache["default"] = albumCover
@@ -816,7 +816,7 @@ class CatalogFrame(tk.Frame):
             self.current_file_path = filedialog.askopenfilename(
                 title="Select a File",
                 filetypes=[("Image Files", ["*.png","*.jpg","*.jpeg","*.gif"]), ("All Files", "*.*")],
-                initialdir="./album_covers")
+                initialdir="./Code")
             if self.current_file_path:
                 self.current_file_path = os.path.relpath(self.current_file_path, start=os.getcwd())
                 file_label.config(text=f"Selected file: {self.current_file_path}")
@@ -950,7 +950,7 @@ class CatalogFrame(tk.Frame):
             self.current_file_path = filedialog.askopenfilename(
                 title="Select a File",
                 filetypes=[("Image Files", ["*.png","*.jpg","*.jpeg","*.gif"]), ("All Files", "*.*")],
-                initialdir="./album_covers")
+                initialdir="./Code")
             if self.current_file_path:
                 self.current_file_path = os.path.relpath(self.current_file_path, start=os.getcwd())
                 file_label.config(text=f"Selected file: {self.current_file_path}")

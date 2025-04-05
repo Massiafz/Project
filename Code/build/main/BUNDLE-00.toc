@@ -1,4 +1,0 @@
-([('main',
-   '/Users/Bach/Documents/OTU WINTER 2025/Software '
-   'Design/project/Project/Code/dist/main',
-   'EXECUTABLE')],)
