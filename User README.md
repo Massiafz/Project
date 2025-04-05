@@ -28,7 +28,7 @@ cd Project/code
   ```
 - **For Windows Users:**
   ```batch
-  ./brightbyte-windows.exe
+  ./brightbyte-windows
   ```
   Windows and Linux are able to run the executable from the file explorer but mac is not able to.
 
