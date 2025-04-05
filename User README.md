@@ -61,6 +61,14 @@ cd Project
 - **Edit Account:** Update your account details including password and username.
 - **Logout:** Easily log out of your account, which resets the interface to the login screen.
 
+### Demo Videos
+
+- [How to Run the Software & Brief Walkthrough of the Documentation](https://youtu.be/u4mqQTsF3OQ)
+- [Login Interface & Search Functionality](https://youtu.be/9gNyYvDeJmc)
+- [Edit, Add, Delete Albums & Edit Account](https://youtu.be/wjz4acvXSR8)
+- [Favourite & Unfavourite Albums](https://youtu.be/b2SkPcyBFnI)
+
+
 ## User Interface Overview
 
 - **Navigation Bar:**  
