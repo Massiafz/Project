@@ -67,7 +67,7 @@ cd Project
 
 ### Demo Videos
 
-- [How to Run the Software & Brief Walkthrough of the Documentation](https://youtu.be/u4mqQTsF3OQ)
+- [How to Run the Software]([https://youtu.be/u4mqQTsF3OQ](https://youtu.be/jkMh7jDM-TM))
 - [Login Interface & Search Functionality](https://youtu.be/9gNyYvDeJmc)
 - [Edit, Add, Delete Albums & Edit Account](https://youtu.be/wjz4acvXSR8)
 - [Favourite & Unfavourite Albums](https://youtu.be/b2SkPcyBFnI)
