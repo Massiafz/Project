@@ -11,6 +11,39 @@ BrightByte Music Cataloging Software is a Python desktop application built using
 - **Back-End Lead:** Jason Guan (100927182)
 - **Front-End Lead:** Vincent Tseng (100912590)
 
+## Getting Started
+
+### Step 1: Clone the Repository
+
+Open your terminal or command prompt and run the following command:
+```bash
+git clone https://github.com/Massiafz/Project.git
+```
+
+### Step 2: Navigate to the Code Directory
+
+Change your directory to where the application code is located:
+```bash
+cd Project
+```
+
+### Step 3: Run the Executable
+
+- **For Linux Users:**
+  ```bash
+  ./brightbyte-linux
+  ```
+- **For Windows Users:**
+  ```batch
+  ./brightbyte-windows
+  ```
+- **For Mac Users:**
+  ```batch
+  ./brightbyte-mac
+  ```
+  Windows and Linux are able to run the executable from the file explorer but mac is not able to.
+
+*These scripts will set up and launch the application on your system.*
 ## Project Structure
 
 - **/Project/code/main.py**  
