@@ -4,7 +4,7 @@ import pandas as pd
 
 # Discogs API credentials
 DISCOGS_API_URL = "https://api.discogs.com/database/search"
-DISCOGS_TOKEN = "cjFlWrGyvoXUzOjeOIHnSpKiYXfsnPrrRlnAKnWE"
+DISCOGS_TOKEN = "Your Discogs API key"
 
 
 def clean_date(date_str):
