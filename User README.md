@@ -22,13 +22,17 @@ cd Project
 
 ### Step 3: Run the Executable
 
-- **For Mac/Linux Users:**
+- **For Linux Users:**
   ```bash
   ./brightbyte-linux
   ```
 - **For Windows Users:**
   ```batch
   ./brightbyte-windows
+  ```
+- **For Mac Users:**
+  ```batch
+  ./brightbyte-mac
   ```
   Windows and Linux are able to run the executable from the file explorer but mac is not able to.
 
