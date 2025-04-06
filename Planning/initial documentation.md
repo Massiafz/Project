@@ -476,63 +476,6 @@ def refresh_catalog(self):
 ![Screenshot 2025-03-04 213451](https://github.com/user-attachments/assets/dcf2bc50-284f-4300-8599-4d676abfbd3d)
 ![Screenshot 2025-03-01 180753](https://github.com/user-attachments/assets/fafed00a-bc28-443d-a95d-b1b30a71743a)
 
-# 📌 Setup Guide: Install, Configure, and Run BrightByte Music Cataloging Software
-
-## 📖 Overview
-BrightByte Music Cataloging Software is a Python-based application that helps users manage and browse a catalog of music albums. This guide provides step-by-step instructions to install, configure, and run the software.
-
----
-## 🔧 Prerequisites
-Before proceeding, ensure the following dependencies are installed:
-
-### ✅ Python 3
-Check if Python is installed by running:
-```sh
-python --version
-```
-If not installed, download it from [python.org](https://www.python.org/downloads/).
-
-### ✅ pip (Python Package Manager)
-Verify pip installation with:
-```sh
-pip --version
-```
-
-### ✅ Git
-Ensure Git is installed by running:
-```sh
-git --version
-```
-If not installed, download Git from [git-scm.com](https://git-scm.com/downloads).
-
----
-## 📥 Installation & Setup
-
-### Clone the Repository
-Open a terminal and run:
-```sh
-git clone https://github.com/Massiafz/Project.git
-```
----
-## 🚀 Running the Software
-
-### Run the Program
-Navigate to the directory containing `main.py`:
-```sh
-cd Project/Code
-```
-Run the application with:
-```
-run the build file (windows): 
-```
-./build.bat
-```
-Or run the build file (linux/mac): 
-```
-build.sh
-```
----
-🎵 **Enjoy using BrightByte Music Cataloging Software!** 🎶
 
 
 
