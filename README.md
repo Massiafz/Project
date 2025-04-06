@@ -175,13 +175,17 @@ This class serves as the central controller of the application by extending `tk.
 
 ### Build Files: 
 
-For Mac and Linux: 
+For Linux: 
 ```
-./build.sh
+./build-linux.sh
 ```
 For Windows: 
 ```
-./build.bat
+./build-windows.bat
+```
+For Mac:
+```
+./build-mac.sh
 ```
 
 ## Conclusion
